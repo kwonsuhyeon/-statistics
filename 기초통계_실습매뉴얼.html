@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>파이썬을 활용한 기초통계 분석 — 실습 매뉴얼 (1차시)</title><style>
+:root { --ink:#1F2328; --mut:#656D76; --rule:#D0D7DE; --rule-soft:#E7EBEF; --accent:#0550AE; --code-bg:#F6F8FA;
+        --term-rule:#57606A; --note-rule:#9A6700; --out-rule:#1A7F37; --toc-w:260px; --main-w:1280px; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; font-family:Pretendard,'Noto Sans KR','Malgun Gothic','맑은 고딕',sans-serif; color:var(--ink); background:#fff; line-height:1.7; font-size:15.5px; -webkit-font-smoothing:antialiased; }
+header.top { padding:26px 40px 18px; border-bottom:1px solid var(--rule); }
+header.top h1 { margin:0; font-size:20px; font-weight:600; letter-spacing:-.01em; }
+header.top .sub { font-size:13px; color:var(--mut); margin-top:2px; }
+.layout { display:flex; align-items:flex-start; }
+.layout .wrap { flex:1 1 auto; min-width:0; display:flex; justify-content:center; }
+nav.toc { position:sticky; top:0; width:var(--toc-w); flex:0 0 var(--toc-w); height:100vh; overflow:auto; border-right:1px solid var(--rule-soft); padding:22px 8px 60px 24px; font-size:13.5px; }
+nav.toc .toc-title { font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--mut); margin:0 0 10px 8px; }
+nav.toc a { display:block; color:var(--ink); text-decoration:none; padding:3px 8px; border-left:2px solid transparent; line-height:1.5; }
+nav.toc a.h2 { font-weight:600; margin-top:10px; }
+nav.toc a.h3 { padding-left:20px; color:var(--mut); font-size:13px; }
+nav.toc a:hover { color:var(--accent); }
+nav.toc a.active { border-left-color:var(--accent); color:var(--accent); }
+nav.toc summary { display:none; }
+main { width:100%; max-width:var(--main-w); padding:24px 48px 140px; }
+main > section { padding:8px 0 40px; border-bottom:1px solid var(--rule-soft); margin-bottom:40px; }
+main > section:last-child { border-bottom:none; }
+h2 { font-size:26px; font-weight:600; letter-spacing:-.015em; margin:24px 0 18px; scroll-margin-top:20px; }
+h3 { font-size:19px; font-weight:600; margin:36px 0 10px; scroll-margin-top:20px; }
+h4 { font-size:15.5px; font-weight:600; margin:22px 0 6px; }
+p { margin:10px 0; }
+a { color:var(--accent); }
+strong { font-weight:600; }
+table { border-collapse:collapse; width:100%; margin:14px 0 18px; font-size:14.5px; }
+th, td { border-top:1px solid var(--rule-soft); padding:9px 12px 9px 0; vertical-align:middle; text-align:left; }
+th { font-weight:600; color:var(--mut); font-size:13px; border-top:none; border-bottom:1px solid var(--rule); }
+tr:last-child td { border-bottom:1px solid var(--rule-soft); }
+td.num { text-align:right; font-variant-numeric:tabular-nums; }
+.tablewrap { overflow-x:auto; }
+ul, ol { padding-left:24px; margin:8px 0; }
+li { margin:5px 0; }
+li::marker { color:var(--mut); }
+code { background:var(--code-bg); border:1px solid var(--rule-soft); padding:1px 5px; border-radius:3px; font-family:Consolas,'D2Coding',ui-monospace,monospace; font-size:.9em; }
+pre { background:var(--code-bg); border:1px solid var(--rule-soft); border-radius:4px; padding:12px 14px; overflow-x:auto; font-size:13.5px; line-height:1.6; margin:12px 0; font-family:Consolas,'D2Coding',ui-monospace,monospace; }
+pre code { background:none; border:none; padding:0; font-size:inherit; }
+blockquote { margin:14px 0; padding:2px 0 2px 16px; border-left:2px solid var(--rule); color:#3b434b; }
+mark { background:none; color:var(--accent); font-weight:600; padding:0; }
+.box { position:relative; border-left:2px solid var(--accent); margin:14px 0 18px; padding-left:16px; }
+.box.term { border-left-color:var(--term-rule); }
+.box.out { border-left-color:var(--out-rule); }
+.box .hd { display:flex; justify-content:space-between; align-items:baseline; font-size:11.5px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); margin-bottom:4px; }
+.box.term .hd { color:var(--term-rule); }
+.box.out .hd { color:var(--out-rule); }
+.box pre { margin:0; white-space:pre; }
+.box.out pre { background:#fff; }
+.box button { font:inherit; font-size:12px; letter-spacing:0; text-transform:none; border:none; background:none; color:var(--mut); padding:0; cursor:pointer; }
+.box button:hover, .box button:focus-visible { color:var(--accent); text-decoration:underline; outline:none; }
+figure { margin:14px 0 20px; }
+figure img { max-width:100%; border:1px solid var(--rule); }
+figure.half img { max-width:420px; }
+figcaption { font-size:13px; color:var(--mut); margin-top:6px; }
+.figrow { display:flex; gap:24px; flex-wrap:wrap; align-items:flex-start; }
+.figrow figure { flex:1 1 380px; margin:14px 0; }
+.note { border-left:2px solid var(--note-rule); padding:2px 0 2px 16px; margin:16px 0 20px; }
+.note .tag { font-size:11.5px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--note-rule); margin-bottom:4px; }
+.fill { display:inline-block; min-width:96px; padding:0 6px; border-bottom:1px dashed var(--accent); color:var(--accent); }
+ol.steps { padding-left:24px; }
+kbd { font-family:inherit; font-size:.9em; border:1px solid var(--rule); border-bottom-width:2px; border-radius:3px; padding:0 5px; background:#fff; }
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:0 32px; }
+td:has(> .chk) { width:60px; }
+.chk { width:18px; height:18px; accent-color:var(--accent); cursor:pointer; vertical-align:middle; }
+.chk-table label { cursor:pointer; }
+.chk-table tr:has(.chk:checked) label { color:var(--mut); text-decoration:line-through; }
+.chk-done { font-size:13.5px; color:var(--mut); margin-top:-6px; }
+.dl { display:flex; flex-wrap:wrap; gap:12px; margin:12px 0 18px; }
+.dl a { display:inline-flex; align-items:center; gap:8px; padding:8px 16px; border:1.5px solid var(--accent); border-radius:6px; color:var(--accent); text-decoration:none; font-weight:600; font-size:14.5px; background:#fff; }
+.dl a:hover { background:var(--accent); color:#fff; }
+.dl a small { font-weight:400; color:var(--mut); font-size:12.5px; }
+.dl a:hover small { color:#e6eefb; }
+:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior:auto; } }
+@media (max-width:1100px) {
+  .layout { display:block; }
+  nav.toc { position:static; width:auto; height:auto; border-right:none; border-bottom:1px solid var(--rule-soft); padding:12px 20px; }
+  nav.toc summary { display:block; cursor:pointer; font-weight:600; }
+  nav.toc details:not([open]) .toc-title, nav.toc details:not([open]) a { display:none; }
+  .layout .wrap { display:block; }
+  main { padding:16px 20px 80px; }
+  .grid2 { grid-template-columns:1fr; }
+}
+</style></head>
+<body><header class="top"><h1>파이썬을 활용한 기초통계 분석 — 실습 매뉴얼</h1><div class="sub">1차시 · 환경설정 → 데이터 구조 이해 → <code>describe()</code> 실행까지 · 참가자용 — 보고 따라 하기</div></header>
+<div class="layout"><nav class="toc"><details open><summary>목차</summary><div class="toc-title">목차</div>
+<a class="h2" href="#0-시작-전에">0. 시작 전에</a>
+<a class="h3" href="#이-실습이-하는-일">이 실습이 하는 일</a>
+<a class="h3" href="#기본-용어-여섯-가지">기본 용어 여섯 가지</a>
+<a class="h3" href="#두-개의-입력-칸을-구분하세요">두 개의 입력 칸을 구분하세요</a>
+<a class="h2" href="#1-환경설정">1. 환경설정</a>
+<a class="h3" href="#1-1-Python-설치">1-1. Python 설치</a>
+<a class="h3" href="#1-2-VS-Code-설치">1-2. VS Code 설치</a>
+<a class="h3" href="#1-3-VS-Code-확장-설치">1-3. VS Code 확장 설치 — Python · Jupyter</a>
+<a class="h3" href="#1-4-pandas-설치">1-4. pandas 설치</a>
+<a class="h3" href="#1-5-작업-폴더와-노트북-만들기">1-5. 작업 폴더와 노트북 만들기</a>
+<a class="h2" href="#2-데이터-이해">2. 데이터 이해</a>
+<a class="h3" href="#2-1-어떤-데이터인가">2-1. 어떤 데이터인가</a>
+<a class="h3" href="#2-2-변수-47개-한눈에">2-2. 변수 47개 한눈에</a>
+<a class="h3" href="#2-3-숫자처럼-보여도-종류가-다릅니다">2-3. 숫자처럼 보여도 종류가 다릅니다</a>
+<a class="h2" href="#3-따라-하기">3. 따라 하기 — 불러오기부터 describe까지</a>
+<a class="h3" href="#3-1-데이터-불러오기">3-1. 데이터 불러오기</a>
+<a class="h3" href="#3-2-생김새-확인">3-2. 생김새 확인 — head · shape · columns</a>
+<a class="h3" href="#3-3-구조-확인">3-3. 구조 확인 — info</a>
+<a class="h3" href="#3-4-describe-실행">3-4. describe 실행 — 오늘의 목표</a>
+<a class="h3" href="#3-5-describe-읽는-법">3-5. describe 결과 읽는 법</a>
+<a class="h3" href="#3-6-오늘-확인-체크리스트">3-6. 오늘 확인 체크리스트</a>
+<a class="h2" href="#4-다음-차시-미리보기">4. 다음 차시 미리보기</a>
+<a class="h3" href="#4-1-대표값-하나씩">4-1. 대표값 하나씩 — mean · median · std</a>
+<a class="h3" href="#4-2-범주형-변수">4-2. 범주형 변수 — value_counts</a>
+<a class="h3" href="#4-3-결측값">4-3. 결측값 — isna</a>
+<a class="h3" href="#4-4-agg와-groupby">4-4. 여러 통계량 한 번에 — agg · groupby</a>
+<a class="h3" href="#4-5-새-변수-만들기">4-5. 새 변수 만들기 — 나이</a>
+<a class="h2" href="#5-막혔을-때">5. 막혔을 때</a>
+<a class="h2" href="#부록">부록</a>
+<a class="h3" href="#A-명령-한눈에">A. 명령 한눈에</a>
+<a class="h3" href="#B-describe-항목-뜻">B. describe 항목 뜻</a>
+</details></nav><div class="wrap"><main>
+
+<section id="0-시작-전에"><h2>0. 시작 전에</h2>
+<h3 id="이-실습이-하는-일">이 실습이 하는 일</h3>
+<p>파이썬(정확히는 <strong>pandas</strong> 라이브러리)으로 설문 데이터 한 개를 열어 보고, 그 안에 무엇이 들어 있는지 <strong>기초통계량</strong>으로 요약하는 연습입니다. 프로그래밍 경험이 전혀 없다고 가정합니다. 오늘 1차시의 목표는 딱 세 가지입니다.</p>
+<svg viewBox="0 0 1100 130" xmlns="http://www.w3.org/2000/svg" font-family="Malgun Gothic, sans-serif" font-size="14" style="width:100%;max-width:1000px;display:block;margin:18px 0 6px">
+<defs><marker id="ar" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#656D76"/></marker></defs>
+<g fill="#fff" stroke="#1F2328" stroke-width="1.2">
+<rect x="10" y="30" width="330" height="64" rx="10"/><rect x="385" y="30" width="330" height="64" rx="10"/><rect x="760" y="30" width="330" height="64" rx="10"/></g>
+<g fill="#1F2328" text-anchor="middle" font-weight="600">
+<text x="175" y="56">① 환경설정</text><text x="550" y="56">② 데이터 구조 이해</text><text x="925" y="56">③ describe() 실행</text></g>
+<g fill="#656D76" text-anchor="middle" font-size="12">
+<text x="175" y="78">Python · VS Code · 확장 · pandas</text><text x="550" y="78">10,759명 × 47개 변수가 무엇인지</text><text x="925" y="78">기초통계량 표가 나오는 것 확인</text></g>
+<g stroke="#656D76" stroke-width="1.2" marker-end="url(#ar)">
+<line x1="340" y1="62" x2="383" y2="62"/><line x1="715" y1="62" x2="758" y2="62"/></g>
+<text x="550" y="120" fill="#0550AE" text-anchor="middle" font-size="12" font-weight="600">4장(다음 차시 미리보기)은 오늘 시간이 남을 때만 진행합니다</text>
+</svg>
+
+<h3 id="기본-용어-여섯-가지">기본 용어 여섯 가지</h3>
+<div class="tablewrap"><table>
+<tr><th style="width:170px">용어</th><th>뜻</th></tr>
+<tr><td><strong>VS Code</strong></td><td>코드를 쓰고 실행하는 프로그램(편집기). 이 안에서 노트북 파일을 열고 터미널도 띄웁니다</td></tr>
+<tr><td><strong>노트북(.ipynb)</strong></td><td>코드를 <strong>셀</strong>이라는 칸 단위로 나눠 실행하고, 결과가 바로 아래에 붙어 나오는 파일. 오늘 모든 코드는 노트북 셀에 입력합니다</td></tr>
+<tr><td><strong>셀 실행</strong></td><td>셀 안에 커서를 두고 <kbd>Shift</kbd>+<kbd>Enter</kbd>. 셀이 실행되고 다음 셀로 넘어갑니다</td></tr>
+<tr><td><strong>pandas</strong></td><td>표 형태 데이터를 다루는 파이썬 라이브러리. 코드에서는 <code>pd</code>라는 짧은 이름으로 부릅니다</td></tr>
+<tr><td><strong>데이터프레임(df)</strong></td><td>pandas가 CSV를 읽어 만든 표. 행(row) = 응답자 한 명, 열(column) = 변수 하나. 코드에서는 <code>df</code>라는 이름에 담습니다</td></tr>
+<tr><td><strong>결측값(NaN)</strong></td><td>응답이 없어 비어 있는 칸. 화면에는 <code>NaN</code>으로 표시되고, 통계량을 계산할 때 자동으로 제외됩니다</td></tr>
+</table></div>
+
+<h3 id="두-개의-입력-칸을-구분하세요">두 개의 입력 칸을 구분하세요</h3>
+<p>이 매뉴얼의 입력 상자는 세 가지 색입니다. 왼쪽 선이 <strong>파란 것은 노트북 셀</strong>, <strong>회색인 것은 터미널</strong>에 입력합니다. <strong>초록색은 실행 결과</strong>이니 입력하지 않고 내 화면과 비교만 하면 됩니다. 터미널 명령을 노트북 셀에 넣거나 그 반대로 하면 동작하지 않습니다.</p>
+<div class="box cell"><div class="hd"><span>노트북 셀에 입력</span><button type="button">복사</button></div><pre>(예) df.describe()</pre></div>
+<div class="box term"><div class="hd"><span>터미널에 입력</span><button type="button">복사</button></div><pre>(예) python -m pip install pandas</pre></div>
+<div class="box out"><div class="hd"><span>실행 결과 — 입력하지 않음</span></div><pre>(예) (10759, 47)</pre></div>
+</section>
+
+<section id="1-환경설정"><h2>1. 환경설정</h2>
+<p>순서는 <strong>Python 설치 → VS Code 설치 → VS Code 확장(Python · Jupyter) 설치 → pandas 설치 → 작업 폴더와 노트북 만들기</strong>입니다. 이미 되어 있는 항목은 확인 명령만 돌려 보고 넘어가면 됩니다.</p>
+
+<h3 id="1-1-Python-설치">1-1. Python 설치</h3>
+<ol class="steps">
+<li><a href="https://www.python.org/downloads/" target="_blank" rel="noopener">https://www.python.org/downloads/</a> 에서 <strong>Python 3.12</strong> (3.9 이상이면 됨) 내려받기 — 구글에 <code>python install</code>을 검색해 첫 결과 <strong>Download Python - Python.org</strong>를 눌러도 됩니다</li>
+<li>설치 첫 화면에서 <strong>"Add python.exe to PATH"</strong> 체크 → Install Now</li>
+<li>확인: 시작 메뉴에서 <strong>PowerShell</strong>을 열고 아래 입력</li>
+</ol>
+<div class="box term"><div class="hd"><span>터미널에 입력</span><button type="button">복사</button></div><pre>python --version</pre></div>
+<p><code>Python 3.12.x</code> 처럼 버전이 나오면 성공입니다. "python을 찾을 수 없습니다"가 나오면 PATH 체크를 빠뜨린 것이니 다시 설치하세요.</p>
+<figure><img src="docs/manual/img/01a-python-search.png" alt="그림 01-a. 구글에서 python install 검색 — 첫 결과 Download Python - Python.org 클릭"><figcaption>그림 01-a. 구글에서 python install 검색 — 첫 결과 Download Python - Python.org 클릭</figcaption></figure>
+<figure><img src="docs/manual/img/01-python-path.png" alt="그림 01. Python 설치 첫 화면 — 아래 Add Python to PATH 체크 후 Install Now (버전 숫자는 달라도 됨)"><figcaption>그림 01. Python 설치 첫 화면 — 아래 "Add Python to PATH" 체크 후 Install Now (버전 숫자는 달라도 됨)</figcaption></figure>
+<figure><img src="docs/manual/img/01b-python-git-version.png" alt="그림 01-b. 명령 프롬프트에서 python --version 확인 — 버전이 나오면 성공"><figcaption>그림 01-b. 명령 프롬프트에서 <code>python --version</code> 확인 — 버전이 나오면 성공 (<code>git --version</code>은 이 실습에서는 필요 없음)</figcaption></figure>
+
+<h3 id="1-2-VS-Code-설치">1-2. VS Code 설치</h3>
+<p>코드를 쓰고 실행하는 편집기입니다. 노트북 파일(.ipynb)을 열고, 셀을 실행하고, 필요하면 터미널도 같은 창 안에서 띄울 수 있어 이 실습의 <strong>기본 작업 공간</strong>이 됩니다.</p>
+<ol class="steps">
+<li><a href="https://code.visualstudio.com/" target="_blank" rel="noopener">https://code.visualstudio.com/</a> 에서 내려받아 설치합니다 (설치 중 "PATH에 추가", "탐색기 상황에 맞는 메뉴에 'Code로 열기' 추가"는 체크해 두면 편합니다)</li>
+<li>첫 실행 시 "Welcome to VS Code — Sign in to use GitHub Copilot" 화면은 오른쪽 아래 <strong>Continue without Signing In</strong>으로 건너뜁니다 (로그인 불필요)</li>
+<li><strong>한국어 메뉴</strong>: 왼쪽 확장(Extensions) 아이콘 → 검색창에 <code>한국어</code> → <strong>Korean Language Pack for Visual Studio Code</strong>(Microsoft) Install → 오른쪽 아래 "Change Language and Restart" 클릭</li>
+<li><strong>밝은 테마</strong>(교육장 빔프로젝터에서 잘 보이게): 왼쪽 아래 톱니바퀴 → 테마 → 색 테마 → <code>2026 밝게</code> 또는 <code>Light Modern</code> 선택</li>
+</ol>
+<figure><img src="docs/manual/img/02i-vscode-welcome.png" alt="그림 02-a. VS Code 첫 화면 — Continue without Signing In"><figcaption>그림 02-a. VS Code 첫 화면 — Continue without Signing In</figcaption></figure>
+<figure><img src="docs/manual/img/02j-vscode-korean.png" alt="그림 02-b. 확장에서 한국어 검색 → Korean Language Pack 설치"><figcaption>그림 02-b. 확장에서 "한국어" 검색 → Korean Language Pack 설치</figcaption></figure>
+<figure><img src="docs/manual/img/02k-vscode-restart.png" alt="그림 02-c. Change Language and Restart"><figcaption>그림 02-c. Change Language and Restart</figcaption></figure>
+<figure><img src="docs/manual/img/02l-vscode-theme-menu.png" alt="그림 02-d. 톱니바퀴 → 테마 → 색 테마"><figcaption>그림 02-d. 톱니바퀴 → 테마 → 색 테마</figcaption></figure>
+<figure><img src="docs/manual/img/02m-vscode-theme-list.png" alt="그림 02-e. 색 테마 목록 — 밝은 테마 선택"><figcaption>그림 02-e. 색 테마 목록 — 밝은 테마 선택</figcaption></figure>
+
+<h3 id="1-3-VS-Code-확장-설치">1-3. VS Code 확장 설치 — Python · Jupyter</h3>
+<p>VS Code는 처음엔 파이썬을 모릅니다. 확장(Extensions) 두 개를 설치해야 파이썬 코드를 알아보고(<strong>Python</strong>), 노트북 셀을 실행할 수 있습니다(<strong>Jupyter</strong>). 확장 화면은 왼쪽 세로 아이콘 중 <strong>네모 네 개</strong> 모양, 또는 <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd>로 엽니다.</p>
+<h4>1-3-a. Python 확장</h4>
+<ol class="steps">
+<li>확장 검색창에 <code>python</code>을 입력합니다</li>
+<li>목록 맨 위 <strong>Python</strong>(제작자 <strong>Microsoft</strong>, 파란 체크 표시) 옆의 <strong>설치</strong>(Install)를 클릭합니다</li>
+<li>설치가 끝나면 <strong>Pylance</strong>·<strong>Python Debugger</strong>·<strong>Python Environments</strong>가 함께 설치됩니다 (그림 03-a처럼 네 개가 보이면 정상). 따로 설치할 필요 없습니다</li>
+<li>Pylance를 클릭해 보면 그림 03-b처럼 <strong>"사용 안 함"·"제거"</strong> 버튼이 보입니다 — 이미 설치되어 있다는 뜻이니 누르지 마세요</li>
+</ol>
+<div class="figrow">
+<figure class="half"><img src="docs/manual/img/03a-ext-python-search.png" alt="그림 03-a. 확장 검색창에 python 입력 — Python Debugger · Python · Pylance · Python Environments (모두 Microsoft)"><figcaption>그림 03-a. 확장 검색창에 <code>python</code> 입력 — Python을 설치하면 Debugger · Pylance · Environments가 함께 설치됨 (모두 Microsoft)</figcaption></figure>
+<figure><img src="docs/manual/img/03b-ext-pylance.png" alt="그림 03-b. Pylance 상세 화면 — 사용 안 함 · 제거 버튼이 보이면 설치 완료"><figcaption>그림 03-b. Pylance 상세 화면 — "사용 안 함"·"제거" 버튼이 보이면 설치 완료 상태 (누르지 않음)</figcaption></figure>
+</div>
+<h4>1-3-b. Jupyter 확장</h4>
+<ol class="steps">
+<li>확장 검색창을 지우고 <code>jupyter</code>를 입력합니다</li>
+<li>목록 맨 위 <strong>Jupyter</strong>(Microsoft, "Jupyter notebook support, interactive programming…")의 <strong>설치</strong>를 클릭합니다</li>
+<li>설치가 끝나면 <strong>Jupyter Keymap · Jupyter Notebook Renderers · Jupyter Cell Tags · Jupyter Slide Show</strong>가 함께 설치됩니다. 그림 03-c에서 Jupyter 아이콘에 붙은 <strong>숫자 4</strong>가 "함께 설치된 확장 4개"라는 뜻입니다</li>
+<li>Jupyter를 클릭해 상세 화면(그림 03-d)에 "사용 안 함"·"제거"가 보이면 완료입니다</li>
+</ol>
+<div class="figrow">
+<figure class="half"><img src="docs/manual/img/03c-ext-jupyter-search.png" alt="그림 03-c. 확장 검색창에 jupyter 입력 — Jupyter(숫자 4 배지) · Keymap · Notebook Renderers · Cell Tags · Slide Show"><figcaption>그림 03-c. 확장 검색창에 <code>jupyter</code> 입력 — Jupyter를 설치하면 Keymap · Renderers · Cell Tags · Slide Show 4개가 함께 설치됨</figcaption></figure>
+<figure><img src="docs/manual/img/03d-ext-jupyter-detail.png" alt="그림 03-d. Jupyter 상세 화면 — 사용 안 함 · 제거 버튼이 보이면 설치 완료"><figcaption>그림 03-d. Jupyter 상세 화면 — "사용 안 함"·"제거" 버튼이 보이면 설치 완료 상태</figcaption></figure>
+</div>
+<div class="note"><div class="tag">참고</div>
+<p>같은 이름의 확장이 여러 개 보여도 <strong>제작자가 Microsoft이고 파란 체크가 있는 것</strong>만 설치하면 됩니다. "Jupyter PowerToys"처럼 실험적 기능이 붙은 확장은 필요 없습니다.</p></div>
+
+<h3 id="1-4-pandas-설치">1-4. pandas 설치</h3>
+<p>pandas는 파이썬에 기본으로 들어 있지 않아 한 번 설치해야 합니다. VS Code 안에서 메뉴 <strong>터미널 → 새 터미널</strong>(<kbd>Ctrl</kbd>+<kbd>`</kbd>)을 열고 아래를 입력합니다. 시작 메뉴의 PowerShell에서 해도 똑같습니다.</p>
+<div class="box term"><div class="hd"><span>터미널에 입력</span><button type="button">복사</button></div><pre>python -m pip install pandas</pre></div>
+<p>글자가 한참 올라간 뒤 <code>Successfully installed pandas-2.x.x numpy-...</code>가 나오면 됩니다. 이미 설치되어 있으면 <code>Requirement already satisfied</code>가 나오는데 이것도 정상입니다. 노란 <code>[notice] A new release of pip is available</code>은 오류가 아니니 무시하세요.</p>
+<p>확인:</p>
+<div class="box term"><div class="hd"><span>터미널에 입력</span><button type="button">복사</button></div><pre>python -c "import pandas; print(pandas.__version__)"</pre></div>
+<div class="box out"><div class="hd"><span>실행 결과</span></div><pre>2.3.3</pre></div>
+<p>버전 숫자는 달라도 됩니다. 숫자 대신 <code>ModuleNotFoundError: No module named 'pandas'</code>가 나오면 설치가 안 된 것이니 위 설치 명령을 다시 실행하세요.</p>
+
+<h3 id="1-5-작업-폴더와-노트북-만들기">1-5. 작업 폴더와 노트북 만들기</h3>
+<p>파일 경로 때문에 막히는 일이 가장 많습니다. <strong>데이터 파일과 노트북 파일을 같은 폴더에</strong> 두면 경로를 신경 쓸 필요가 없습니다.</p>
+<ol class="steps">
+<li>탐색기에서 <code>C:\stats</code> 폴더를 만듭니다 (한글·공백이 없는 짧은 이름이면 무엇이든 됩니다)</li>
+<li>아래 버튼으로 <strong><code>hccp_worker_2023_selected.csv</code></strong>를 내려받아 그 폴더에 넣습니다. 브라우저가 파일을 바로 열어 버리면 버튼에서 오른쪽 클릭 → <strong>다른 이름으로 링크 저장</strong>
+<div class="dl">
+<a href="data/hccp_worker_2023_selected.csv" download>⬇ hccp_worker_2023_selected.csv <small>실습 데이터 · 1.2 MB · 10,759행</small></a>
+<a href="data/data.csv" download>⬇ data.csv <small>연습용 소규모 데이터 · 150행</small></a>
+</div></li>
+<li>VS Code에서 <strong>파일 → 폴더 열기</strong> → <code>C:\stats</code> 선택. "이 폴더의 작성자를 신뢰합니까?"가 뜨면 <strong>예, 신뢰합니다</strong></li>
+<li>왼쪽 탐색기(파일 목록)의 빈 곳에서 오른쪽 클릭 → <strong>새 파일</strong> → 이름을 <code>기초통계.ipynb</code>로 입력합니다. 확장자 <code>.ipynb</code>까지 정확히 써야 노트북으로 열립니다</li>
+<li>노트북이 열리면 <strong>오른쪽 위 "커널 선택"</strong>(Select Kernel) 클릭 → <strong>Python 환경…</strong> → <code>Python 3.12.x</code> 선택. 처음 한 번은 "ipykernel 패키지를 설치해야 합니다" 창이 뜨는데 <strong>설치</strong>를 누르고 잠시 기다립니다</li>
+<li>첫 셀에 아래를 입력하고 <kbd>Shift</kbd>+<kbd>Enter</kbd>. 셀 아래에 결과가 붙어 나오면 환경설정 끝입니다</li>
+</ol>
+<div class="box cell"><div class="hd"><span>노트북 셀에 입력</span><button type="button">복사</button></div><pre>print("준비 완료")</pre></div>
+<div class="box out"><div class="hd"><span>실행 결과</span></div><pre>준비 완료</pre></div>
+<div class="note"><div class="tag">노트북 조작 세 가지만</div>
+<ul>
+<li><strong>셀 실행</strong>: <kbd>Shift</kbd>+<kbd>Enter</kbd> (실행 후 다음 셀로 이동). 셀 왼쪽 ▷ 버튼을 눌러도 됩니다</li>
+<li><strong>새 셀 추가</strong>: 셀 위·아래 경계에 마우스를 올리면 나오는 <strong>+ 코드</strong> 클릭</li>
+<li><strong>저장</strong>: <kbd>Ctrl</kbd>+<kbd>S</kbd>. 결과까지 함께 저장됩니다</li>
+</ul></div>
+</section>
+
+<section id="2-데이터-이해"><h2>2. 데이터 이해</h2>
+<h3 id="2-1-어떤-데이터인가">2-1. 어떤 데이터인가</h3>
+<div class="dl">
+<a href="data/hccp_worker_2023_selected.csv" download>⬇ hccp_worker_2023_selected.csv <small>실습 데이터 내려받기</small></a>
+</div>
+<p><code>hccp_worker_2023_selected.csv</code>는 한국직업능력연구원 <strong>인적자본기업패널(HCCP, Human Capital Corporate Panel)</strong> 2023년 <strong>근로자 조사</strong>에서 교육훈련·직무만족·소득 관련 변수를 추려 만든 파일입니다.</p>
+<div class="tablewrap"><table>
+<tr><th style="width:200px">항목</th><th>내용</th></tr>
+<tr><td>한 행(row)</td><td><strong>근로자 한 명</strong>의 응답</td></tr>
+<tr><td>행 수</td><td><strong>10,759명</strong></td></tr>
+<tr><td>열 수(변수)</td><td><strong>47개</strong></td></tr>
+<tr><td>비어 있는 칸</td><td>6개 변수에 결측값이 있음 (해당 없는 문항, 무응답). 나머지 41개는 빠진 값 없음</td></tr>
+<tr><td>파일 형식</td><td>CSV(쉼표로 구분한 텍스트). 첫 줄이 변수 이름, 둘째 줄부터 데이터</td></tr>
+</table></div>
+<p>메모장으로 열면 이렇게 보입니다. 첫 줄이 변수 이름 47개, 그 아래가 응답자 한 명당 한 줄입니다. 쉼표 사이가 비어 있는 곳(<code>,,</code>)이 결측값입니다.</p>
+<div class="box out"><div class="hd"><span>파일 원본 첫 3줄 (일부 생략)</span></div><pre>company_id,worker_id,company_worker_id,industry_group,company_size, ... ,gender,birth_year,marital_status,education_level,major_field
+1,1,101,1,1,1,2,16,1,1,2,2,2,,2,,1,2,2,2,4,3,3,2,3,3,3,3,3,3,4,3,3,3,3,3,1,2,40,0,6600,,2,1995,2,5,3
+1,6,106,1,1,3,1,7,1,2,1,2,1,4,1,4,2,4,3,4,4,2,4,2,2,3,2,2,3,2,3,3,4,2,4,4,1,2,40,0,,495,1,1991,1,5,3</pre></div>
+
+<h3 id="2-2-변수-47개-한눈에">2-2. 변수 47개 한눈에</h3>
+<p>변수 이름은 모두 영어 소문자와 밑줄(<code>_</code>)로 되어 있습니다. 7개 묶음으로 나눠 보면 구조가 한눈에 들어옵니다. "값" 열의 코드(1, 2, …)가 무슨 뜻인지는 HCCP 코드북을 따르며, 오늘은 <strong>숫자의 종류</strong>(2-3)만 구분할 수 있으면 충분합니다.</p>
+<h4>A. 식별자 — 3개 (통계 계산에서 제외)</h4>
+<div class="tablewrap"><table>
+<tr><th style="width:280px">변수명</th><th style="width:260px">뜻</th><th>값</th></tr>
+<tr><td><code>company_id</code></td><td>기업 번호</td><td>1 ~ 10792</td></tr>
+<tr><td><code>worker_id</code></td><td>기업 내 근로자 번호</td><td>1 ~ 482</td></tr>
+<tr><td><code>company_worker_id</code></td><td>기업+근로자 결합 번호</td><td>101 ~ 10792401 (거의 모두 다른 값)</td></tr>
+</table></div>
+<h4>B. 기업·직무 정보 — 5개</h4>
+<div class="tablewrap"><table>
+<tr><th style="width:280px">변수명</th><th style="width:260px">뜻</th><th>값</th></tr>
+<tr><td><code>industry_group</code></td><td>산업군</td><td>코드 1 ~ 3</td></tr>
+<tr><td><code>company_size</code></td><td>기업 규모</td><td>코드 1 ~ 3</td></tr>
+<tr><td><code>current_position</code></td><td>현재 직급</td><td>코드 1 ~ 8</td></tr>
+<tr><td><code>manager_authority</code></td><td>관리자 권한 유무</td><td>1 / 2</td></tr>
+<tr><td><code>job_field</code></td><td>직무 분야</td><td>코드 1 ~ 25</td></tr>
+</table></div>
+<h4>C. 교육훈련 — 13개</h4>
+<div class="tablewrap"><table>
+<tr><th style="width:280px">변수명</th><th style="width:260px">뜻</th><th>값</th></tr>
+<tr><td><code>training_general</code></td><td>일반(공통) 교육 참여</td><td>1 / 2</td></tr>
+<tr><td><code>training_manager</code></td><td>관리자 교육 참여</td><td>1 / 2</td></tr>
+<tr><td><code>training_job_related</code></td><td>직무 관련 교육 참여</td><td>1 / 2</td></tr>
+<tr><td><code>training_other_field</code></td><td>타 분야 교육 참여</td><td>1 / 2</td></tr>
+<tr><td><code>ojt_participation</code></td><td>OJT(현장훈련) 참여</td><td>1 / 2</td></tr>
+<tr><td><code>ojt_effect</code></td><td>OJT 효과 인식</td><td>1 ~ 5점, <strong>미참여자는 결측</strong> (3,903명)</td></tr>
+<tr><td><code>offjt_participation</code></td><td>Off-JT(집체교육) 참여</td><td>1 / 2</td></tr>
+<tr><td><code>offjt_effect</code></td><td>Off-JT 효과 인식</td><td>1 ~ 5점, <strong>미참여자는 결측</strong> (5,086명)</td></tr>
+<tr><td><code>training_days_group</code></td><td>교육훈련 일수 구간</td><td>코드 1 ~ 13</td></tr>
+<tr><td><code>training_sufficient</code></td><td>교육훈련이 충분했는가</td><td>1 ~ 5점</td></tr>
+<tr><td><code>training_equal_opportunity</code></td><td>교육 기회가 공평했는가</td><td>1 ~ 5점</td></tr>
+<tr><td><code>training_job_relevance</code></td><td>교육이 직무와 관련 있는가</td><td>1 ~ 5점</td></tr>
+<tr><td><code>training_field_applicable</code></td><td>교육 내용을 현장에 적용할 수 있는가</td><td>1 ~ 5점</td></tr>
+</table></div>
+<h4>D. 숙련·자격 — 3개</h4>
+<div class="tablewrap"><table>
+<tr><th style="width:280px">변수명</th><th style="width:260px">뜻</th><th>값</th></tr>
+<tr><td><code>skill_level_entry</code></td><td>입사 당시 숙련 수준</td><td>1 ~ 7점</td></tr>
+<tr><td><code>skill_level_current</code></td><td>현재 숙련 수준</td><td>1 ~ 7점</td></tr>
+<tr><td><code>has_job_certificate</code></td><td>직무 관련 자격증 보유</td><td>1 / 2</td></tr>
+</table></div>
+<h4>E. 직무 태도·만족 — 12개 (모두 1 ~ 5점)</h4>
+<div class="tablewrap"><table>
+<tr><th style="width:280px">변수명</th><th style="width:260px">뜻</th><th style="width:280px">변수명</th><th>뜻</th></tr>
+<tr><td><code>work_autonomy</code></td><td>업무 자율성</td><td><code>relationship_satisfaction</code></td><td>인간관계 만족</td></tr>
+<tr><td><code>team_trust</code></td><td>동료·팀 신뢰</td><td><code>overall_job_satisfaction</code></td><td><strong>전반적 직무 만족</strong></td></tr>
+<tr><td><code>free_opinion_to_supervisor</code></td><td>상사에게 자유롭게 의견 제시</td><td><code>turnover_intention</code></td><td>이직 의도</td></tr>
+<tr><td><code>fair_evaluation_reward</code></td><td>평가·보상의 공정성</td><td><code>organizational_loyalty</code></td><td>조직 충성도</td></tr>
+<tr><td><code>work_content_satisfaction</code></td><td>업무 내용 만족</td><td><code>fatigue</code></td><td>피로도</td></tr>
+<tr><td><code>wage_satisfaction</code></td><td>임금 만족</td><td><code>job_tension</code></td><td>직무 긴장</td></tr>
+</table></div>
+<h4>F. 고용·근로시간·소득 — 6개</h4>
+<div class="tablewrap"><table>
+<tr><th style="width:280px">변수명</th><th style="width:260px">뜻</th><th>값</th></tr>
+<tr><td><code>regular_employee</code></td><td>정규직 여부</td><td>1 / 2</td></tr>
+<tr><td><code>union_member</code></td><td>노조 가입 여부</td><td>1 / 2</td></tr>
+<tr><td><code>regular_work_hours</code></td><td>주당 정규 근로시간</td><td>28 ~ 60시간 (대부분 40)</td></tr>
+<tr><td><code>overtime_hours</code></td><td>주당 초과 근로시간</td><td>0 ~ 20시간</td></tr>
+<tr><td><code>annual_income_10k_krw</code></td><td><strong>연소득 (만원)</strong></td><td>2,000 ~ 21,800만원. 결측 2,222명 (월소득으로 응답한 사람)</td></tr>
+<tr><td><code>monthly_income_10k_krw</code></td><td>월소득 (만원)</td><td>170 ~ 1,000만원. 결측 8,637명 (연소득으로 응답한 사람)</td></tr>
+</table></div>
+<h4>G. 인적 속성 — 5개</h4>
+<div class="tablewrap"><table>
+<tr><th style="width:280px">변수명</th><th style="width:260px">뜻</th><th>값</th></tr>
+<tr><td><code>gender</code></td><td><strong>성별</strong></td><td>1 / 2 (1이 7,534명, 2가 3,225명)</td></tr>
+<tr><td><code>birth_year</code></td><td>출생 연도</td><td>1942 ~ 2005. 결측 28명. 2023에서 빼면 나이가 됩니다</td></tr>
+<tr><td><code>marital_status</code></td><td>혼인 상태</td><td>코드 1 ~ 3</td></tr>
+<tr><td><code>education_level</code></td><td><strong>학력</strong></td><td>코드 1 ~ 7 (5가 5,794명으로 가장 많음)</td></tr>
+<tr><td><code>major_field</code></td><td>전공 분야</td><td>코드 1 ~ 8. 결측 2,706명</td></tr>
+</table></div>
+
+<h3 id="2-3-숫자처럼-보여도-종류가-다릅니다">2-3. 숫자처럼 보여도 종류가 다릅니다</h3>
+<p>이 파일은 값이 전부 숫자라서 파이썬이 다루기 쉽지만, 그만큼 <strong>사람이 종류를 구분해 줘야</strong> 합니다. 같은 "3"이라도 아래 세 가지는 전혀 다른 의미입니다.</p>
+<div class="tablewrap"><table>
+<tr><th style="width:170px">종류</th><th style="width:330px">예</th><th style="width:260px">평균을 내면</th><th>알맞은 요약</th></tr>
+<tr><td><strong>연속형</strong><br><small>등간·비율척도</small></td><td><code>annual_income_10k_krw</code>, <code>regular_work_hours</code>, <code>overtime_hours</code>, <code>birth_year</code></td><td>의미 있음 (평균 연소득 5,137만원)</td><td>평균·중앙값·표준편차 → <code>describe()</code></td></tr>
+<tr><td><strong>서열척도</strong><br><small>순서는 있지만 간격이 일정하지 않은 척도</small></td><td>1~5점 만족도 12개, 1~7점 숙련 수준, 효과 인식</td><td>참고용으로는 쓸 수 있음 (평균 3.43점)</td><td>평균과 함께 <strong>빈도표</strong>도 봐야 함</td></tr>
+<tr><td><strong>명명척도(코드)</strong><br><small>순서나 크기가 없는 데이터</small></td><td><code>gender</code>, <code>industry_group</code>, <code>education_level</code>, <code>job_field</code>, 참여 여부 1/2</td><td><strong>의미 없음</strong> (성별 평균 1.30?)</td><td><strong>빈도표</strong> → <code>value_counts()</code> (4-2)</td></tr>
+<tr><td><strong>식별자</strong></td><td><code>company_id</code>, <code>worker_id</code>, <code>company_worker_id</code></td><td>의미 없음</td><td>계산에서 제외</td></tr>
+</table></div>
+<p>오늘 실행할 <code>describe()</code>는 이 구분을 모르고 <strong>47개 열 전부에 평균을 계산</strong>합니다. 그래서 결과표에서 "성별 평균 1.30"처럼 뜻 없는 숫자가 함께 나오는데, 오류가 아니라 <strong>내가 골라 읽어야 하는 것</strong>입니다. 3-5에서 다시 짚습니다.</p>
+</section>
+
+<section id="3-따라-하기"><h2>3. 따라 하기 — 불러오기부터 describe까지</h2>
+<div class="dl">
+<a href="stats_lesson1.py" download>⬇ stats_lesson1.py <small>오늘 코드 5개를 한 파일로 · 터미널에서 python stats_lesson1.py</small></a>
+</div>
+<p>1-5에서 만든 <code>기초통계.ipynb</code>에서 진행합니다. 상자 하나가 셀 하나입니다. 순서대로 새 셀을 만들어 붙여 넣고 <kbd>Shift</kbd>+<kbd>Enter</kbd>로 실행하세요. <code>#</code> 뒤의 글은 설명(주석)이라 함께 붙여 넣어도 실행에 영향이 없습니다.</p>
+
+<h3 id="3-1-데이터-불러오기">3-1. 데이터 불러오기</h3>
+<div class="box cell"><div class="hd"><span>노트북 셀에 입력 — 셀 1</span><button type="button">복사</button></div><pre>import pandas as pd   # pandas를 불러와서 pd라는 짧은 이름으로 부른다
+
+df = pd.read_csv("hccp_worker_2023_selected.csv")   # CSV 파일을 읽어 df(데이터프레임)에 담는다</pre></div>
+<p>아무 결과도 안 나오는 것이 정상입니다. 오류 없이 셀 왼쪽에 초록 체크가 뜨면 성공입니다. 이 한 줄이 실행된 뒤부터 <code>df</code>라는 이름으로 표 전체를 부를 수 있습니다.</p>
+<div class="note"><div class="tag">파일을 다른 폴더에 두었다면</div>
+<p>탐색기에서 CSV 파일을 <kbd>Shift</kbd>+오른쪽 클릭 → "경로로 복사"를 한 뒤, 따옴표 앞에 <code>r</code>을 붙여 전체 경로를 씁니다. <code>r</code>은 역슬래시(<code>\</code>)를 그대로 읽으라는 표시입니다.</p>
+<div class="box cell"><div class="hd"><span>노트북 셀에 입력 — 대안</span><button type="button">복사</button></div><pre>df = pd.read_csv(r"C:\Users\<mark>사용자이름</mark>\Downloads\hccp_worker_2023_selected.csv")</pre></div></div>
+
+<h3 id="3-2-생김새-확인">3-2. 생김새 확인 — head · shape · columns</h3>
+<div class="box cell"><div class="hd"><span>노트북 셀에 입력 — 셀 2</span><button type="button">복사</button></div><pre>df.head()   # 처음 5행만 보여준다 (괄호 안에 10을 넣으면 10행)</pre></div>
+<p>노트북에서는 가로로 스크롤되는 표가 나옵니다. 맨 왼쪽 굵은 0~4는 행 번호(0부터 시작), 그 옆이 47개 변수 값입니다. 비어 있는 칸은 <code>NaN</code>으로 보입니다.</p>
+<div class="box out"><div class="hd"><span>실행 결과 (가운데 열 생략)</span></div><pre>   company_id  worker_id  company_worker_id  industry_group  ...  birth_year  marital_status  education_level  major_field
+0           1          1                101               1  ...      1995.0               2                5          3.0
+1           1          6                106               1  ...      1991.0               1                5          3.0
+2           1         11                111               1  ...      1984.0               2                5          1.0
+3           1         12                112               1  ...      1985.0               2                5          3.0
+4           1        401               1401               1  ...      1975.0               2                3          NaN
+
+[5 rows x 47 columns]</pre></div>
+<div class="box cell"><div class="hd"><span>노트북 셀에 입력 — 셀 3</span><button type="button">복사</button></div><pre>df.shape   # (행 수, 열 수)</pre></div>
+<div class="box out"><div class="hd"><span>실행 결과</span></div><pre>(10759, 47)</pre></div>
+<p>응답자 10,759명, 변수 47개. 2장에서 본 숫자와 같습니다. <code>shape</code> 뒤에 괄호가 없는 점에 주의하세요 — 이건 명령(함수)이 아니라 표가 가진 속성입니다.</p>
+<div class="box cell"><div class="hd"><span>노트북 셀에 입력 — 셀 4</span><button type="button">복사</button></div><pre>df.columns   # 변수(열) 이름 목록</pre></div>
+<div class="box out"><div class="hd"><span>실행 결과 (일부)</span></div><pre>Index(['company_id', 'worker_id', 'company_worker_id', 'industry_group',
+       'company_size', 'current_position', 'manager_authority', 'job_field',
+       'training_general', 'training_manager', 'training_job_related',
+       ...
+       'gender', 'birth_year', 'marital_status', 'education_level',
+       'major_field'],
+      dtype='object')</pre></div>
+<p>이 목록에서 변수 이름을 <strong>복사해서</strong> 쓰는 습관을 들이세요. 직접 타이핑하면 밑줄 하나, 철자 하나 차이로 <code>KeyError</code>가 납니다.</p>
+
+<h3 id="3-3-구조-확인">3-3. 구조 확인 — info</h3>
+<div class="box cell"><div class="hd"><span>노트북 셀에 입력 — 셀 5</span><button type="button">복사</button></div><pre>df.info()   # 변수마다 빠진 값이 없는 개수(Non-Null Count)와 자료형(Dtype)</pre></div>
+<div class="box out"><div class="hd"><span>실행 결과 (일부)</span></div><pre>&lt;class 'pandas.core.frame.DataFrame'&gt;
+RangeIndex: 10759 entries, 0 to 10758
+Data columns (total 47 columns):
+ #   Column                      Non-Null Count  Dtype
+---  ------                      --------------  -----
+ 0   company_id                  10759 non-null  int64
+ 1   worker_id                   10759 non-null  int64
+ ...
+ 13  ojt_effect                  6856 non-null   float64
+ 15  offjt_effect                5673 non-null   float64
+ ...
+ 40  annual_income_10k_krw       8537 non-null   float64
+ 41  monthly_income_10k_krw      2122 non-null   float64
+ 42  gender                      10759 non-null  int64
+ 43  birth_year                  10731 non-null  float64
+ ...
+ 46  major_field                 8053 non-null   float64
+dtypes: float64(8), int64(39)
+memory usage: 3.9 MB</pre></div>
+<p>읽는 법 세 가지:</p>
+<ul>
+<li><strong>Non-Null Count</strong>가 10759보다 작으면 그만큼 결측값이 있다는 뜻입니다. <code>annual_income_10k_krw</code>는 8,537명만 응답했습니다</li>
+<li><strong>Dtype</strong>의 <code>int64</code>는 정수, <code>float64</code>는 소수점이 있는 숫자입니다. 원래 정수인 변수(<code>ojt_effect</code> 1~5점)도 결측값이 섞이면 <code>float64</code>로 바뀝니다 — 그래서 <code>4.0</code>처럼 보입니다</li>
+<li><strong>문자(object) 열이 하나도 없습니다.</strong> 47개 전부 숫자라서 바로 통계량을 낼 수 있습니다</li>
+</ul>
+
+<h3 id="3-4-describe-실행">3-4. describe 실행 — 오늘의 목표</h3>
+<div class="box cell"><div class="hd"><span>노트북 셀에 입력 — 셀 6</span><button type="button">복사</button></div><pre>df.describe()   # 숫자형 변수 전체의 기초통계량</pre></div>
+<div class="box out"><div class="hd"><span>실행 결과 (가운데 열 생략)</span></div><pre>         company_id     worker_id  company_worker_id  ...  marital_status  education_level  major_field
+count  10759.000000  10759.000000       1.075900e+04  ...    10759.000000     10759.000000  8053.000000
+mean    2334.727391    350.355888       2.143197e+06  ...        1.545683         4.268984     2.610952
+std     2103.769291    146.454976       2.170592e+06  ...        0.532706         1.100945     1.459169
+min        1.000000      1.000000       1.010000e+02  ...        1.000000         1.000000     1.000000
+25%      656.000000    401.000000       3.563545e+05  ...        1.000000         3.000000     1.000000
+50%     1930.000000    412.000000       1.308421e+06  ...        2.000000         5.000000     3.000000
+75%     3258.000000    429.000000       3.148402e+06  ...        1.000000         5.000000     3.000000
+max    10792.000000    482.000000       1.079240e+07  ...        3.000000         7.000000     8.000000
+
+[8 rows x 47 columns]</pre></div>
+<p>8행 × 47열 표가 나오면 <strong>오늘 목표 달성</strong>입니다. 노트북에서는 가로 스크롤 표로 보입니다. <code>1.075900e+04</code>처럼 보이는 것은 값이 너무 커서 지수 표기(10,759를 1.0759 × 10⁴로)한 것으로, <code>company_worker_id</code>같은 식별자 열에서만 나타나니 신경 쓰지 않아도 됩니다.</p>
+<p>47개를 한 번에 보면 읽기 어렵습니다. <strong>보고 싶은 변수만 골라</strong> 실행하면 표가 작아집니다. 대괄호를 두 겹(<code>[[ ]]</code>) 쓰는 것에 주의하세요.</p>
+<div class="box cell"><div class="hd"><span>노트북 셀에 입력 — 셀 7</span><button type="button">복사</button></div><pre>df[["annual_income_10k_krw", "regular_work_hours", "overall_job_satisfaction"]].describe().round(2)
+# 연소득, 주당 정규 근로시간, 전반적 직무만족 세 변수만. .round(2)는 소수점 둘째 자리까지</pre></div>
+<div class="box out"><div class="hd"><span>실행 결과</span></div><pre>       annual_income_10k_krw  regular_work_hours  overall_job_satisfaction
+count                8537.00            10759.00                  10759.00
+mean                 5137.46               40.44                      3.43
+std                  1998.99                2.25                      0.72
+min                  2000.00               28.00                      1.00
+25%                  3800.00               40.00                      3.00
+50%                  4700.00               40.00                      3.00
+75%                  6000.00               40.00                      4.00
+max                 21800.00               60.00                      5.00</pre></div>
+<p>변수 하나만 보려면 대괄호 한 겹입니다.</p>
+<div class="box cell"><div class="hd"><span>노트북 셀에 입력 — 셀 8</span><button type="button">복사</button></div><pre>df["annual_income_10k_krw"].describe().round(2)   # 연소득 하나만</pre></div>
+<div class="box out"><div class="hd"><span>실행 결과</span></div><pre>count     8537.00
+mean      5137.46
+std       1998.99
+min       2000.00
+25%       3800.00
+50%       4700.00
+75%       6000.00
+max      21800.00
+Name: annual_income_10k_krw, dtype: float64</pre></div>
+
+<h3 id="3-5-describe-읽는-법">3-5. describe 결과 읽는 법</h3>
+<p>연소득(<code>annual_income_10k_krw</code>, 단위 만원) 열을 위에서부터 읽어 봅니다.</p>
+<div class="tablewrap"><table>
+<tr><th style="width:110px">행</th><th style="width:180px">뜻</th><th style="width:140px">연소득 값</th><th>이렇게 읽습니다</th></tr>
+<tr><td><code>count</code></td><td>결측값을 뺀 응답 수</td><td class="num">8,537</td><td>10,759명 중 8,537명만 연소득에 응답. 나머지 2,222명은 월소득으로 답해 여기선 비어 있음</td></tr>
+<tr><td><code>mean</code></td><td>평균</td><td class="num">5,137.46</td><td>평균 연소득 약 5,137만원</td></tr>
+<tr><td><code>std</code></td><td>표준편차 (흩어진 정도)</td><td class="num">1,998.99</td><td>평균에서 대략 ±2,000만원 안에 응답자 대다수가 있음</td></tr>
+<tr><td><code>min</code></td><td>최솟값</td><td class="num">2,000</td><td>가장 낮은 응답 2,000만원</td></tr>
+<tr><td><code>25%</code></td><td>1사분위수</td><td class="num">3,800</td><td>낮은 쪽부터 세어 25% 지점. 4명 중 1명은 3,800만원 이하</td></tr>
+<tr><td><code>50%</code></td><td><strong>중앙값</strong></td><td class="num">4,700</td><td>한가운데 사람의 연소득. 절반은 이보다 적고 절반은 많음</td></tr>
+<tr><td><code>75%</code></td><td>3사분위수</td><td class="num">6,000</td><td>4명 중 3명은 6,000만원 이하</td></tr>
+<tr><td><code>max</code></td><td>최댓값</td><td class="num">21,800</td><td>가장 높은 응답 2억 1,800만원</td></tr>
+</table></div>
+<div class="note"><div class="tag">한 줄 해석 연습</div>
+<p><strong>평균(5,137)이 중앙값(4,700)보다 크다</strong> → 소수의 고소득자가 평균을 끌어올리는, 오른쪽으로 긴 꼬리 분포입니다. 소득처럼 한쪽으로 치우친 변수는 평균보다 <strong>중앙값</strong>이 "보통 사람"을 더 잘 대표합니다. 반대로 근로시간은 평균 40.44, 중앙값 40으로 거의 같고, 25%·50%·75%가 모두 40 → 대부분이 주 40시간이라는 뜻입니다.</p></div>
+<h4>describe가 알려주지 않는 것 — 명명척도 변수</h4>
+<p>2-3에서 예고한 대로 명명척도 변수도 계산됩니다. 성별을 넣어 보면:</p>
+<div class="box cell"><div class="hd"><span>노트북 셀에 입력 — 셀 9</span><button type="button">복사</button></div><pre>df["gender"].describe()   # 명명척도 변수에 describe를 쓰면?</pre></div>
+<div class="box out"><div class="hd"><span>실행 결과</span></div><pre>count    10759.000000
+mean         1.299749
+std          0.458169
+min          1.000000
+25%          1.000000
+50%          1.000000
+75%          2.000000
+max          2.000000
+Name: gender, dtype: float64</pre></div>
+<p>"성별 평균 1.30"은 아무 의미가 없습니다. 이런 변수는 <strong>몇 명씩인지 세는 것</strong>(빈도표)이 맞고, 그 명령이 다음 차시의 <code>value_counts()</code>입니다(4-2). 오늘은 "describe 표에서 명명척도 변수 행은 건너뛰고 읽는다"만 기억하면 됩니다.</p>
+
+<h3 id="3-6-오늘-확인-체크리스트">3-6. 오늘 확인 체크리스트</h3>
+<p>되는 항목마다 체크하세요. 체크 상태는 이 컴퓨터의 브라우저에 저장되어 다시 열어도 유지됩니다.</p>
+<div class="tablewrap"><table class="chk-table">
+<tr><th style="width:60px">확인</th><th>항목</th></tr>
+<tr><td><input type="checkbox" class="chk" id="chk-1" aria-label="확인"></td><td><label for="chk-1">터미널에서 <code>python --version</code>이 3.9 이상으로 나온다</label></td></tr>
+<tr><td><input type="checkbox" class="chk" id="chk-2" aria-label="확인"></td><td><label for="chk-2">VS Code 확장에 Python(+Pylance)과 Jupyter가 설치되어 있다</label></td></tr>
+<tr><td><input type="checkbox" class="chk" id="chk-3" aria-label="확인"></td><td><label for="chk-3">노트북 오른쪽 위에 <code>Python 3.x.x</code> 커널이 선택되어 있다</label></td></tr>
+<tr><td><input type="checkbox" class="chk" id="chk-4" aria-label="확인"></td><td><label for="chk-4"><code>df.shape</code>가 <code>(10759, 47)</code>로 나온다</label></td></tr>
+<tr><td><input type="checkbox" class="chk" id="chk-5" aria-label="확인"></td><td><label for="chk-5"><code>df.describe()</code>가 8행 × 47열 표로 나온다</label></td></tr>
+<tr><td><input type="checkbox" class="chk" id="chk-6" aria-label="확인"></td><td><label for="chk-6">연소득의 count · mean · 50%가 각각 무엇을 뜻하는지 말로 설명할 수 있다</label></td></tr>
+<tr><td><input type="checkbox" class="chk" id="chk-7" aria-label="확인"></td><td><label for="chk-7"><kbd>Ctrl</kbd>+<kbd>S</kbd>로 노트북을 저장했다</label></td></tr>
+</table></div>
+<p class="chk-done" id="chk-done"></p>
+</section>
+
+<section id="4-다음-차시-미리보기"><h2>4. 다음 차시 미리보기</h2>
+<p>오늘 만든 <code>df</code>를 그대로 이어서 씁니다. 시간이 남으면 위에서부터 해 보고, 아니면 다음 차시에 다룹니다. 모든 코드는 진행자의 <code>0511_agg.ipynb</code>와 같습니다.</p>
+
+<h3 id="4-1-대표값-하나씩">4-1. 대표값 하나씩 — mean · median · std</h3>
+<div class="box cell"><div class="hd"><span>노트북 셀에 입력</span><button type="button">복사</button></div><pre>print(df["annual_income_10k_krw"].mean())     # 평균
+print(df["annual_income_10k_krw"].median())   # 중앙값
+print(df["annual_income_10k_krw"].std())      # 표준편차
+print(df["annual_income_10k_krw"].min())      # 최솟값
+print(df["annual_income_10k_krw"].max())      # 최댓값</pre></div>
+<div class="box out"><div class="hd"><span>실행 결과</span></div><pre>5137.457069228066
+4700.0
+1998.988969223284
+2000.0
+21800.0</pre></div>
+<p><code>describe()</code>가 한 번에 보여 준 값을 하나씩 꺼낸 것입니다. 한 셀에서 여러 줄을 출력할 때는 <code>print()</code>로 감싸야 모두 보입니다.</p>
+
+<h3 id="4-2-범주형-변수">4-2. 범주형 변수 — value_counts</h3>
+<div class="box cell"><div class="hd"><span>노트북 셀에 입력</span><button type="button">복사</button></div><pre>df["gender"].value_counts()                          # 빈도표: 코드별 몇 명인지</pre></div>
+<div class="box out"><div class="hd"><span>실행 결과</span></div><pre>gender
+1    7534
+2    3225
+Name: count, dtype: int64</pre></div>
+<div class="box cell"><div class="hd"><span>노트북 셀에 입력</span><button type="button">복사</button></div><pre>df["gender"].value_counts(normalize=True).round(2)   # 비율표: normalize=True</pre></div>
+<div class="box out"><div class="hd"><span>실행 결과</span></div><pre>gender
+1    0.7
+2    0.3
+Name: proportion, dtype: float64</pre></div>
+<p>0.70이 아니라 0.7로 보이는 것은 끝자리 0이 생략된 것일 뿐입니다.</p>
+<div class="box cell"><div class="hd"><span>노트북 셀에 입력</span><button type="button">복사</button></div><pre>df["education_level"].value_counts(dropna=False)    # dropna=False: 결측값도 한 줄로 셈</pre></div>
+<div class="box out"><div class="hd"><span>실행 결과</span></div><pre>education_level
+5    5794
+4    1829
+3    1745
+2     843
+6     405
+1     118
+7      25
+Name: count, dtype: int64</pre></div>
+<p>3-5에서 뜻 없던 "성별 평균 1.30"이 여기서는 "1이 7,534명(70%), 2가 3,225명(30%)"으로 읽힙니다. <strong>명명척도 변수는 describe 대신 value_counts</strong>, 이것이 다음 차시의 핵심입니다.</p>
+
+<h3 id="4-3-결측값">4-3. 결측값 — isna</h3>
+<div class="box cell"><div class="hd"><span>노트북 셀에 입력</span><button type="button">복사</button></div><pre>df.isna().sum().sort_values(ascending=False)
+# df.isna()                     → 칸마다 결측이면 True
+# .sum()                        → True 개수를 변수별로 합산
+# .sort_values(ascending=False) → 많은 순으로 정렬</pre></div>
+<div class="box out"><div class="hd"><span>실행 결과 (일부)</span></div><pre>monthly_income_10k_krw    8637
+offjt_effect              5086
+ojt_effect                3903
+major_field               2706
+annual_income_10k_krw     2222
+birth_year                  28
+fatigue                      0
+...</pre></div>
+<p>2-1의 "결측이 있는 변수 6개"를 코드로 확인한 것입니다. <code>ojt_effect</code>·<code>offjt_effect</code>의 결측은 무응답이 아니라 <strong>미참여자에게는 묻지 않은 문항</strong>이라는 점을 해석할 때 기억해 두세요.</p>
+
+<h3 id="4-4-agg와-groupby">4-4. 여러 통계량 한 번에 — agg · groupby</h3>
+<div class="box cell"><div class="hd"><span>노트북 셀에 입력</span><button type="button">복사</button></div><pre>df["annual_income_10k_krw"].agg(["count", "mean", "median", "std", "min", "max"]).round(2)
+# agg(): 원하는 통계량 이름을 목록으로 넘겨 한 번에 계산. describe에 없는 median도 넣을 수 있음</pre></div>
+<div class="box out"><div class="hd"><span>실행 결과</span></div><pre>count      8537.00
+mean       5137.46
+median     4700.00
+std        1998.99
+min        2000.00
+max       21800.00
+Name: annual_income_10k_krw, dtype: float64</pre></div>
+<div class="box cell"><div class="hd"><span>노트북 셀에 입력</span><button type="button">복사</button></div><pre>df.groupby("gender")["annual_income_10k_krw"].agg(["count", "mean", "median", "std"]).round(2)
+# groupby("gender")          → 성별로 묶어서
+# ["annual_income_10k_krw"]  → 연소득 열을 골라
+# .agg([...])                → 집단별 통계량 계산</pre></div>
+<div class="box out"><div class="hd"><span>실행 결과</span></div><pre>        count     mean  median      std
+gender
+1        6142  5484.76  5000.0  2019.76
+2        2395  4246.80  3868.0  1637.20</pre></div>
+<div class="box cell"><div class="hd"><span>노트북 셀에 입력</span><button type="button">복사</button></div><pre>df.groupby("education_level")["overall_job_satisfaction"].agg(["count", "mean", "std"]).round(2)
+# 학력별 전반적 직무만족 평균</pre></div>
+<div class="box out"><div class="hd"><span>실행 결과</span></div><pre>                 count  mean   std
+education_level
+1                  118  3.55  0.77
+2                  843  3.38  0.66
+3                 1745  3.33  0.71
+4                 1829  3.43  0.71
+5                 5794  3.45  0.72
+6                  405  3.53  0.84
+7                   25  3.36  0.76</pre></div>
+<p>"성별에 따라 소득이 다른가", "학력에 따라 만족도가 다른가"처럼 <strong>집단 비교</strong>가 기초통계 분석의 첫 질문입니다. <code>groupby</code> 한 줄로 집단별 표가 나옵니다.</p>
+
+<h3 id="4-5-새-변수-만들기">4-5. 새 변수 만들기 — 나이</h3>
+<div class="box cell"><div class="hd"><span>노트북 셀에 입력</span><button type="button">복사</button></div><pre>df["age"] = 2023 - df["birth_year"]   # 조사 연도 2023에서 출생연도를 빼 나이 열을 새로 만든다
+df["age"].describe().round(1)</pre></div>
+<div class="box out"><div class="hd"><span>실행 결과</span></div><pre>count    10731.0
+mean        39.1
+std         10.1
+min         18.0
+25%         31.0
+50%         38.0
+75%         46.0
+max         81.0
+Name: age, dtype: float64</pre></div>
+<p>등호 왼쪽에 <strong>없는 열 이름</strong>을 쓰면 새 열이 생깁니다. 이제 <code>df.shape</code>는 <code>(10759, 48)</code>이 됩니다. 원본 CSV 파일은 바뀌지 않습니다.</p>
+
+</section>
+
+<section id="5-막혔을-때"><h2>5. 막혔을 때</h2>
+<p>오류 문구는 셀 아래에 빨간 글씨로 나옵니다. <strong>맨 마지막 줄</strong>만 읽으면 됩니다.</p>
+<div class="tablewrap"><table>
+<tr><th style="width:360px">마지막 줄에 이렇게 나오면</th><th style="width:300px">원인</th><th>조치</th></tr>
+<tr><td><code>ModuleNotFoundError: No module named 'pandas'</code></td><td>pandas가 설치되지 않았거나, 노트북 커널이 다른 파이썬을 가리킴</td><td>터미널에서 1-4 설치 명령 다시 실행. 그래도 같으면 노트북 오른쪽 위 커널을 <code>Python 3.12.x</code>로 다시 선택</td></tr>
+<tr><td><code>FileNotFoundError: [Errno 2] No such file or directory: 'hccp_worker_2023_selected.csv'</code></td><td>노트북과 CSV가 같은 폴더에 없음, 또는 VS Code로 폴더를 열지 않고 파일만 열었음</td><td>1-5대로 <strong>폴더 열기</strong>로 <code>C:\stats</code>를 열고 CSV가 그 안에 있는지 확인 (없으면 1-5의 내려받기 버튼으로 다시 받아 넣기). 또는 3-1의 전체 경로 방식 사용</td></tr>
+<tr><td><code>KeyError: 'annual_income'</code></td><td>변수 이름 오타 (밑줄·철자·대소문자)</td><td><code>df.columns</code> 결과에서 이름을 복사해 붙이기</td></tr>
+<tr><td><code>NameError: name 'df' is not defined</code></td><td>3-1의 셀 1(<code>df = pd.read_csv(...)</code>)을 실행하지 않았거나, 노트북을 다시 열어 기억이 지워짐</td><td>위로 올라가 셀 1부터 순서대로 다시 실행. 메뉴 <strong>모두 실행</strong>(▷▷)을 눌러도 됨</td></tr>
+<tr><td><code>NameError: name 'pd' is not defined</code></td><td><code>import pandas as pd</code>를 실행하지 않음</td><td>셀 1을 먼저 실행</td></tr>
+<tr><td><code>SyntaxError: invalid syntax</code></td><td>따옴표·괄호가 짝이 안 맞음, 또는 터미널 명령(<code>pip install</code>)을 셀에 넣음</td><td>매뉴얼 상자의 <strong>복사</strong> 버튼으로 통째로 붙여 넣기. 회색 상자는 터미널에</td></tr>
+<tr><td><code>SyntaxError: (unicode error) 'unicodeescape'</code></td><td>Windows 경로를 따옴표에 넣을 때 앞에 <code>r</code>을 빠뜨림</td><td><code>r"C:\..."</code>처럼 <code>r</code> 붙이기</td></tr>
+<tr><td>오른쪽 위에 "커널 선택"만 보이고 실행이 안 됨</td><td>커널 미선택</td><td>"커널 선택" → Python 환경 → <code>Python 3.12.x</code>. ipykernel 설치 창이 뜨면 <strong>설치</strong></td></tr>
+<tr><td>셀 왼쪽에 <code>[*]</code>가 계속 돌기만 함</td><td>실행이 끝나지 않음 (첫 실행 시 커널 시동에 10~20초 걸림)</td><td>잠시 기다린다. 1분 넘게 그대로면 오른쪽 위 <strong>다시 시작</strong>(Restart) 후 셀 1부터 재실행</td></tr>
+<tr><td>터미널에서 <code>python : 용어 'python'이(가) … 인식되지 않습니다</code></td><td>Python 설치 시 PATH 체크를 빠뜨림</td><td>1-1 재설치 (Add python.exe to PATH 체크). 설치 후 터미널은 <strong>새로</strong> 연다</td></tr>
+</table></div>
+</section>
+
+<section id="부록"><h2>부록</h2>
+<h3 id="A-명령-한눈에">A. 명령 한눈에</h3>
+<div class="tablewrap"><table>
+<tr><th style="width:200px">하고 싶은 것</th><th style="width:100px">어디에</th><th>입력</th></tr>
+<tr><td>Python 버전 확인</td><td>터미널</td><td><code>python --version</code></td></tr>
+<tr><td>pandas 설치</td><td>터미널</td><td><code>python -m pip install pandas</code></td></tr>
+<tr><td>pandas 불러오기</td><td>셀</td><td><code>import pandas as pd</code></td></tr>
+<tr><td>CSV 읽기</td><td>셀</td><td><code>df = pd.read_csv("hccp_worker_2023_selected.csv")</code></td></tr>
+<tr><td>처음 몇 행</td><td>셀</td><td><code>df.head()</code> / <code>df.head(10)</code></td></tr>
+<tr><td>행·열 수</td><td>셀</td><td><code>df.shape</code></td></tr>
+<tr><td>변수 이름 목록</td><td>셀</td><td><code>df.columns</code></td></tr>
+<tr><td>구조·결측·자료형</td><td>셀</td><td><code>df.info()</code></td></tr>
+<tr><td>기초통계량 전체</td><td>셀</td><td><code>df.describe()</code></td></tr>
+<tr><td>기초통계량 — 변수 하나</td><td>셀</td><td><code>df["변수명"].describe()</code></td></tr>
+<tr><td>기초통계량 — 여러 변수</td><td>셀</td><td><code>df[["변수1", "변수2"]].describe()</code></td></tr>
+<tr><td>소수점 자리 맞추기</td><td>셀</td><td>뒤에 <code>.round(2)</code></td></tr>
+<tr><td>평균 / 중앙값 / 표준편차</td><td>셀</td><td><code>df["변수명"].mean()</code> / <code>.median()</code> / <code>.std()</code></td></tr>
+<tr><td>빈도표 / 비율표</td><td>셀</td><td><code>df["변수명"].value_counts()</code> / <code>.value_counts(normalize=True)</code></td></tr>
+<tr><td>변수별 결측 개수</td><td>셀</td><td><code>df.isna().sum()</code></td></tr>
+<tr><td>통계량 여러 개 한 번에</td><td>셀</td><td><code>df["변수명"].agg(["count", "mean", "median", "std"])</code></td></tr>
+<tr><td>집단별 통계량</td><td>셀</td><td><code>df.groupby("집단변수")["변수명"].agg(["count", "mean"])</code></td></tr>
+<tr><td>새 변수 만들기</td><td>셀</td><td><code>df["age"] = 2023 - df["birth_year"]</code></td></tr>
+</table></div>
+<p>1차시 코드 전체를 한 번에 실행해 보려면 <a href="stats_lesson1.py" download>stats_lesson1.py</a>를 내려받아 CSV와 같은 폴더에 두고 터미널에서 <code>python stats_lesson1.py</code>를 실행하세요.</p>
+<h3 id="B-describe-항목-뜻">B. describe 항목 뜻</h3>
+<div class="tablewrap"><table>
+<tr><th style="width:110px">항목</th><th style="width:200px">우리말</th><th>뜻</th></tr>
+<tr><td><code>count</code></td><td>응답 수</td><td>결측값(NaN)을 제외한 값의 개수. 변수마다 다를 수 있음</td></tr>
+<tr><td><code>mean</code></td><td>평균</td><td>모두 더해 개수로 나눈 값. 극단값에 끌려감</td></tr>
+<tr><td><code>std</code></td><td>표준편차</td><td>평균에서 얼마나 흩어져 있는지. 클수록 값이 넓게 퍼짐</td></tr>
+<tr><td><code>min</code></td><td>최솟값</td><td>가장 작은 값</td></tr>
+<tr><td><code>25%</code></td><td>1사분위수</td><td>작은 쪽에서 25% 지점의 값</td></tr>
+<tr><td><code>50%</code></td><td>중앙값</td><td>한가운데 값. 극단값에 끌리지 않음 → 소득·시간처럼 치우친 변수의 대표값</td></tr>
+<tr><td><code>75%</code></td><td>3사분위수</td><td>작은 쪽에서 75% 지점의 값. 25%와의 차이가 "가운데 절반이 퍼진 범위"</td></tr>
+<tr><td><code>max</code></td><td>최댓값</td><td>가장 큰 값</td></tr>
+</table></div>
+</section>
+</main></div></div>
+<script>
+document.querySelectorAll('.box button').forEach(function(b){
+  b.addEventListener('click',function(){
+    var t=b.closest('.box').querySelector('pre').innerText;
+    navigator.clipboard.writeText(t).then(function(){ var o=b.textContent; b.textContent='복사됨'; setTimeout(function(){b.textContent=o;},1000); });
+  });
+});
+var chks=[].slice.call(document.querySelectorAll('.chk'));var done=document.getElementById('chk-done');
+function chkSave(){try{localStorage.setItem('stats-manual-chk',JSON.stringify(chks.map(function(c){return c.checked;})));}catch(e){}}
+function chkCount(){var k=chks.filter(function(c){return c.checked;}).length;if(done){done.textContent=k===chks.length?'7개 항목 모두 확인했습니다. 오늘 목표 달성입니다.':k+' / '+chks.length+' 확인';}}
+try{var s=JSON.parse(localStorage.getItem('stats-manual-chk')||'[]');chks.forEach(function(c,i){c.checked=!!s[i];});}catch(e){}
+chks.forEach(function(c){c.addEventListener('change',function(){chkSave();chkCount();});});chkCount();
+var links=[].slice.call(document.querySelectorAll('nav.toc a'));
+var heads=links.map(function(a){return document.getElementById(a.getAttribute('href').slice(1));}).filter(Boolean);
+var obs=new IntersectionObserver(function(es){
+  es.forEach(function(e){ if(e.isIntersecting){ links.forEach(function(a){a.classList.toggle('active',a.getAttribute('href')==='#'+e.target.id);}); } });
+},{rootMargin:'0px 0px -75% 0px'});
+heads.forEach(function(h){obs.observe(h);});
+</script></body></html>

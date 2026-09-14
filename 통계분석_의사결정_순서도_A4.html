@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>통계분석 방법 의사결정 순서도 (A4 가로)</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --primary:#003A8C; --primary-dark:#002766; --sky:#1890FF; --sky-light:#E6F4FF;
+  --green:#52C41A; --green-light:#F6FFED; --orange:#FA8C16; --orange-light:#FFF7E6;
+  --purple:#722ED1; --purple-light:#F9F0FF; --text:#262626; --muted:#8C8C8C; --border:#E8E8E8;
+  --line:#91A7CC;
+}
+@page{size:A4 landscape;margin:0}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#E9ECF1;font-family:'Noto Sans KR','Malgun Gothic','Apple SD Gothic Neo',sans-serif;color:var(--text)}
+body{display:flex;justify-content:center;padding:24px 0}
+
+/* ===== A4 sheet ===== */
+.sheet{width:297mm;height:210mm;background:#fff;padding:10mm 11mm 8mm;box-shadow:0 6px 30px rgba(0,0,0,.15);display:flex;flex-direction:column;overflow:hidden;position:relative}
+.sheet::before{content:'';position:absolute;left:0;top:0;right:0;height:5mm;background:linear-gradient(90deg,var(--primary-dark),var(--primary) 60%,var(--sky))}
+
+.head{display:flex;align-items:flex-end;justify-content:space-between;border-bottom:2px solid var(--primary);padding-bottom:6px;margin-bottom:6px}
+.head h1{font-size:19px;font-weight:900;color:var(--primary-dark);letter-spacing:-.01em}
+.head h1 small{display:block;font-size:11px;font-weight:500;color:var(--muted);margin-top:1px}
+.head .fig{font-size:11px;color:var(--muted);text-align:right;line-height:1.5}
+.head .fig b{color:var(--primary);font-weight:700}
+
+/* ===== Tree ===== */
+.tree-wrap{flex:1;display:flex;align-items:center;justify-content:center;background:linear-gradient(#FBFCFF,#F0F5FF);border:1px solid var(--border);border-radius:6px;padding:8px 4px}
+.tree{width:100%}
+.tree ul{display:flex;justify-content:center;padding-top:24px;position:relative;list-style:none}
+.tree li{position:relative;padding:24px 4px 0;text-align:center;flex:1 1 0;display:flex;flex-direction:column;align-items:center}
+.tree li::before,.tree li::after{content:'';position:absolute;top:0;right:50%;width:50%;height:24px;border-top:1.5px solid var(--line)}
+.tree li::after{right:auto;left:50%;border-left:1.5px solid var(--line)}
+.tree li:only-child::before,.tree li:only-child::after{display:none}
+.tree li:only-child{padding-top:0}
+.tree li:first-child::before,.tree li:last-child::after{border:0 none}
+.tree li:last-child::before{border-right:1.5px solid var(--line);border-radius:0 5px 0 0}
+.tree li:first-child::after{border-radius:5px 0 0 0}
+.tree ul ul::before{content:'';position:absolute;top:0;left:50%;width:0;height:24px;border-left:1.5px solid var(--line)}
+.tree > ul{padding-top:0}
+.edge{display:inline-block;font-size:11px;font-weight:700;color:var(--primary);background:#fff;border:1px solid var(--line);border-radius:10px;padding:0 9px;margin-bottom:6px;white-space:nowrap;position:relative;z-index:1;line-height:1.6}
+.node{display:inline-block;padding:8px 11px;border-radius:6px;font-size:13px;line-height:1.35;background:#fff;border:1.4px solid var(--border);max-width:175px;word-break:keep-all}
+.node small{display:block;font-size:11px;color:#595959;font-weight:400;margin-top:2px;line-height:1.3}
+.node.start{background:var(--primary);color:#fff;border-color:var(--primary);font-weight:700;border-radius:20px;padding:7px 22px;font-size:14px}
+.node.q{background:#FFFBE6;border-color:#FFD666;font-weight:700;color:#874D00}
+.node.q::before{content:'?';display:inline-grid;place-items:center;width:14px;height:14px;border-radius:50%;background:#FAAD14;color:#fff;font-size:10px;margin-right:4px;vertical-align:1px}
+.node.leaf{border-width:1.6px;font-weight:700;color:var(--primary-dark)}
+.node.leaf.desc{border-color:#8C8C8C}
+.node.leaf.rel{border-color:var(--green);background:var(--green-light)}
+.node.leaf.t{border-color:var(--sky);background:var(--sky-light)}
+.node.leaf.reg{border-color:var(--purple);background:var(--purple-light)}
+.node.leaf.chi{border-color:var(--orange);background:var(--orange-light)}
+
+/* ===== Footer ===== */
+.foot{display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:10.5px;color:#595959}
+.legend{display:flex;gap:11px;flex-wrap:wrap}
+.legend span{display:flex;align-items:center;gap:4px;white-space:nowrap}
+.legend i{width:10px;height:10px;border-radius:2px;border:1.6px solid;display:inline-block}
+.foot .src{color:var(--muted);text-align:right;white-space:nowrap}
+
+@media print{
+  html,body{background:#fff;padding:0}
+  .sheet{box-shadow:none;width:297mm;height:210mm}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="sheet">
+  <div class="head">
+    <h1>설문조사 데이터 통계분석 방법 의사결정 순서도<small>변수 유형 → 연구 질문 → 분석 방법 · 위에서 아래로 질문에 답하며 내려간다</small></h1>
+    <div class="fig"><b>[그림 xx]</b> 통계분석 방법 선택 절차<br>기초통계 3절 「설문조사 데이터의 통계 분석 실제」</div>
+  </div>
+
+  <div class="tree-wrap">
+    <div class="tree">
+      <ul>
+        <li>
+          <span class="node start">설문 데이터</span>
+          <ul>
+            <li>
+              <span class="node q">무엇이 궁금한가?</span>
+              <ul>
+                <li style="flex:1.1">
+                  <span class="edge">현황 · 분포</span>
+                  <span class="node leaf desc">기술통계<small>범주형: 빈도 · %<br>연속형: 평균 · SD · IQR</small></span>
+                </li>
+                <li style="flex:1.6">
+                  <span class="edge">문항 품질</span>
+                  <span class="node q">신뢰도 · 타당도</span>
+                  <ul>
+                    <li><span class="edge">신뢰도</span><span class="node leaf rel">크론바흐&nbsp;α</span></li>
+                    <li><span class="edge">타당도</span><span class="node leaf rel">요인분석</span></li>
+                  </ul>
+                </li>
+                <li style="flex:7.5">
+                  <span class="edge">차이 · 관계 · 영향</span>
+                  <span class="node q">종속변수 Y 유형?</span>
+                  <ul>
+                    <li style="flex:5">
+                      <span class="edge">연속형 (점수)</span>
+                      <span class="node q">독립변수 X 유형?</span>
+                      <ul>
+                        <li style="flex:2">
+                          <span class="edge">범주형 (집단)</span>
+                          <span class="node q">집단 수?</span>
+                          <ul>
+                            <li><span class="edge">2집단</span><span class="node leaf t">독립표본 t&#8209;test<small>위배 시: Welch's t<br>/ Mann-Whitney U</small></span></li>
+                            <li><span class="edge">3집단 이상</span><span class="node leaf t">일원배치 ANOVA<small>+ 사후검정(Tukey)<br>위배 시: Kruskal-Wallis</small></span></li>
+                          </ul>
+                        </li>
+                        <li style="flex:2">
+                          <span class="edge">연속형 1개</span>
+                          <span class="node q">질문?</span>
+                          <ul>
+                            <li><span class="edge">관계</span><span class="node leaf reg">피어슨 상관<small>서열: Spearman</small></span></li>
+                            <li><span class="edge">영향 · 예측</span><span class="node leaf reg">단순 회귀</span></li>
+                          </ul>
+                        </li>
+                        <li>
+                          <span class="edge">여러 개 혼합</span>
+                          <span class="node leaf reg">다중 회귀<small>범주형은 더미 변수</small></span>
+                        </li>
+                      </ul>
+                    </li>
+                    <li style="flex:3">
+                      <span class="edge">범주형 (등급 · 여부)</span>
+                      <span class="node q">독립변수 X 유형?</span>
+                      <ul>
+                        <li><span class="edge">범주형</span><span class="node leaf chi">카이제곱 독립성 검정<small>교차분석<br>기대빈도&lt;5: Fisher</small></span></li>
+                        <li><span class="edge">없음 (기대비율)</span><span class="node leaf chi">카이제곱 적합도 검정</span></li>
+                        <li><span class="edge">연속형 · 혼합</span><span class="node leaf chi">로지스틱 회귀<small>Odds ratio</small></span></li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="legend">
+      <span><i style="border-color:#FFD666;background:#FFFBE6"></i>판단 질문</span>
+      <span><i style="border-color:#8C8C8C"></i>기술통계</span>
+      <span><i style="border-color:var(--green);background:var(--green-light)"></i>척도 품질 (신뢰도·타당도)</span>
+      <span><i style="border-color:var(--sky);background:var(--sky-light)"></i>집단 간 평균 차이 (t / F)</span>
+      <span><i style="border-color:var(--purple);background:var(--purple-light)"></i>관계 · 영향 (r / β)</span>
+      <span><i style="border-color:var(--orange);background:var(--orange-light)"></i>범주형 빈도 · 비율 (χ² / OR)</span>
+      <span style="color:var(--muted)">※ 상자 안 작은 글씨 = 정규성·등분산성·기대빈도 가정 위배 시 대안</span>
+    </div>
+    <div class="src">t / ANOVA / 회귀는 본 검정 전 Shapiro-Wilk(정규성) · Levene(등분산성) 확인</div>
+  </div>
+</div>
+</body>
+</html>

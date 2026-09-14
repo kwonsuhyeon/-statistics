@@ -1,0 +1,24 @@
+# 공개용 파일만 포함 (화이트리스트)
+*
+!.gitignore
+!기초통계_실습매뉴얼.html
+!통계분석_의사결정_순서도_A4.html
+!stats_lesson1.py
+!data/
+!data/hccp_worker_2023_selected.csv
+!data/data.csv
+!docs/
+!docs/manual/
+!docs/manual/img/
+!docs/manual/img/01-python-path.png
+!docs/manual/img/01a-python-search.png
+!docs/manual/img/01b-python-git-version.png
+!docs/manual/img/02i-vscode-welcome.png
+!docs/manual/img/02j-vscode-korean.png
+!docs/manual/img/02k-vscode-restart.png
+!docs/manual/img/02l-vscode-theme-menu.png
+!docs/manual/img/02m-vscode-theme-list.png
+!docs/manual/img/03a-ext-python-search.png
+!docs/manual/img/03b-ext-pylance.png
+!docs/manual/img/03c-ext-jupyter-search.png
+!docs/manual/img/03d-ext-jupyter-detail.png
