@@ -9,6 +9,9 @@ body { margin:0; font-family:Pretendard,'Noto Sans KR','Malgun Gothic','맑은 �
 header.top { padding:26px 40px 18px; border-bottom:1px solid var(--rule); }
 header.top h1 { margin:0; font-size:20px; font-weight:600; letter-spacing:-.01em; }
 header.top .sub { font-size:13px; color:var(--mut); margin-top:2px; }
+header.top .top-row { display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap; }
+header.top .slides-link { display:inline-flex; align-items:center; gap:8px; padding:10px 18px; border:1.5px solid var(--accent); border-radius:6px; color:var(--accent); background:#fff; text-decoration:none; font-weight:600; font-size:14.5px; white-space:nowrap; }
+header.top .slides-link:hover { background:var(--accent); color:#fff; }
 .layout { display:flex; align-items:flex-start; }
 .layout .wrap { flex:1 1 auto; min-width:0; display:flex; justify-content:center; }
 nav.toc { position:sticky; top:0; width:var(--toc-w); flex:0 0 var(--toc-w); height:100vh; overflow:auto; border-right:1px solid var(--rule-soft); padding:22px 8px 60px 24px; font-size:13.5px; }
@@ -86,7 +89,8 @@ td:has(> .chk) { width:60px; }
   .grid2 { grid-template-columns:1fr; }
 }
 </style></head>
-<body><header class="top"><h1>파이썬을 활용한 기초통계 분석 — 실습 매뉴얼</h1><div class="sub">1차시 · 환경설정 → 데이터 구조 이해 → <code>describe()</code> 실행까지 · 참가자용 — 보고 따라 하기</div></header>
+<body><header class="top"><div class="top-row"><div><h1>파이썬을 활용한 기초통계 분석 — 실습 매뉴얼</h1><div class="sub">1차시 · 환경설정 → 데이터 구조 이해 → <code>describe()</code> 실행까지 · 참가자용 — 보고 따라 하기</div></div>
+<a class="slides-link" href="기초통계_1차시_슬라이드.html" target="_blank" rel="noopener">▶ 1차시 강의 슬라이드 열기</a></div></header>
 <div class="layout"><nav class="toc"><details open><summary>목차</summary><div class="toc-title">목차</div>
 <a class="h2" href="#0-시작-전에">0. 시작 전에</a>
 <a class="h3" href="#이-실습이-하는-일">이 실습이 하는 일</a>
@@ -350,6 +354,7 @@ td:has(> .chk) { width:60px; }
 <section id="3-따라-하기"><h2>3. 따라 하기 — 불러오기부터 describe까지</h2>
 <div class="dl">
 <a href="stats_lesson1.py" download>⬇ stats_lesson1.py <small>오늘 코드 5개를 한 파일로 · 터미널에서 python stats_lesson1.py</small></a>
+<a href="기초통계_1차시_슬라이드.html" target="_blank" rel="noopener">▶ 1차시 강의 슬라이드 <small>수업에서 본 화면 15장</small></a>
 </div>
 <p>1-5에서 만든 <code>기초통계.ipynb</code>에서 진행합니다. 상자 하나가 셀 하나입니다. 순서대로 새 셀을 만들어 붙여 넣고 <kbd>Shift</kbd>+<kbd>Enter</kbd>로 실행하세요. <code>#</code> 뒤의 글은 설명(주석)이라 함께 붙여 넣어도 실행에 영향이 없습니다.</p>
 

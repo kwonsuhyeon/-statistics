@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>파이썬을 활용한 기초통계 분석 — 1차시</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===========================================
+   THEME — 종이·잉크 + 노트북 셀 색 구분
+   색을 바꾸려면 여기 변수만 바꾸면 됩니다
+   =========================================== */
+:root{
+  --paper:#FBF7EF;        /* 슬라이드 배경 (크림 종이) */
+  --paper-2:#F2EBDD;      /* 살짝 진한 종이 */
+  --ink:#1B1F2A;          /* 본문 글자 */
+  --ink-soft:#5B6270;     /* 보조 글자 */
+  --rule:#D8D0BF;         /* 선 */
+  --cell:#0550AE;         /* 노트북 셀 (파랑) */
+  --cell-bg:#EEF3FB;
+  --out:#1A7F37;          /* 실행 결과 (초록) */
+  --out-bg:#EEF7F0;
+  --warn:#B8541A;         /* 강조·주의 (주황) */
+  --warn-bg:#FBEEE4;
+  --stage-bg:#1B1F2A;
+  --slide-bg:var(--paper);
+
+  --font-display:'Gowun Batang',serif;
+  --font-body:'IBM Plex Sans KR',sans-serif;
+  --font-mono:'IBM Plex Mono','Nanum Gothic Coding',monospace;
+
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+
+/* ===========================================
+   FIXED 16:9 STAGE: MANDATORY BASE STYLES
+   =========================================== */
+html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--stage-bg,#000)}
+.deck-viewport{position:fixed;inset:0;overflow:hidden;background:var(--stage-bg,#000)}
+.deck-stage{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:hidden;transform-origin:0 0;background:var(--slide-bg,#fff)}
+.slide{position:absolute;inset:0;width:1920px;height:1080px;overflow:hidden;display:block;visibility:hidden;opacity:0;pointer-events:none;background:var(--slide-bg,#fff)}
+.slide.active,.slide.visible{visibility:visible;opacity:1;pointer-events:auto;z-index:1}
+img,video,canvas,svg{max-width:100%;max-height:100%}
+.deck-controls{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:1000}
+@media print{
+  html,body{width:1920px;height:auto;overflow:visible;background:#fff}
+  .deck-viewport{position:static;overflow:visible;background:#fff}
+  .deck-stage{position:static;width:auto;height:auto;transform:none!important;background:none}
+  .slide{position:relative;display:block!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;width:1920px;height:1080px;break-after:page;page-break-after:always}
+  .slide:last-child{break-after:auto;page-break-after:auto}
+  .deck-controls{display:none!important}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.2s!important}}
+
+/* ===========================================
+   SLIDE COMMON — 종이 격자 배경, 여백, 페이지 번호
+   =========================================== */
+.slide{
+  font-family:var(--font-body);color:var(--ink);
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(var(--rule) 1px,transparent 1px),
+    linear-gradient(90deg,var(--rule) 1px,transparent 1px);
+  background-size:96px 96px;
+  background-position:-1px -1px;
+}
+.slide::before{ /* 격자를 은은하게 덮는 종이 막 */
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 30% 20%,rgba(251,247,239,.55),rgba(251,247,239,.92) 70%);
+  pointer-events:none;
+}
+.slide-content{position:relative;z-index:1;width:1920px;height:1080px;padding:84px 120px 110px;display:flex;flex-direction:column}
+.kicker{font-family:var(--font-mono);font-size:24px;letter-spacing:.14em;color:var(--cell);text-transform:uppercase;margin-bottom:18px}
+h2{font-family:var(--font-display);font-size:68px;font-weight:700;line-height:1.2;letter-spacing:-.01em;margin-bottom:36px;word-break:keep-all}
+h2 em{font-style:normal;color:var(--cell)}
+p.lead{font-size:34px;line-height:1.55;color:var(--ink-soft);max-width:1500px;word-break:keep-all}
+.pagenum{position:absolute;right:120px;bottom:56px;font-family:var(--font-mono);font-size:22px;color:var(--ink-soft);z-index:2}
+.footer-tag{position:absolute;left:120px;bottom:56px;font-family:var(--font-mono);font-size:20px;color:var(--ink-soft);z-index:2;letter-spacing:.06em}
+
+/* 등장 애니메이션 */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.slide.visible .reveal{opacity:1;transform:none}
+.slide.visible .reveal:nth-child(1){transition-delay:.05s}
+.slide.visible .reveal:nth-child(2){transition-delay:.15s}
+.slide.visible .reveal:nth-child(3){transition-delay:.25s}
+.slide.visible .reveal:nth-child(4){transition-delay:.35s}
+.slide.visible .reveal:nth-child(5){transition-delay:.45s}
+.slide.visible .reveal:nth-child(6){transition-delay:.55s}
+.slide.visible .reveal:nth-child(7){transition-delay:.65s}
+.slide.visible .reveal:nth-child(8){transition-delay:.75s}
+
+/* ===========================================
+   COMPONENTS — 코드 셀 / 실행 결과 / 카드 / 표
+   =========================================== */
+.cell,.out{border-left:8px solid var(--cell);background:var(--cell-bg);border-radius:0 12px 12px 0;padding:22px 34px;position:relative;overflow:hidden}
+.cell .lbl,.out .lbl{font-family:var(--font-mono);font-size:19px;letter-spacing:.12em;text-transform:uppercase;color:var(--cell);margin-bottom:12px;font-weight:600}
+.out{border-left-color:var(--out);background:var(--out-bg)}
+.out .lbl{color:var(--out)}
+pre{font-family:var(--font-mono);font-size:30px;line-height:1.5;white-space:pre;color:var(--ink)}
+pre.small{font-size:21px;line-height:1.4}
+pre .c{color:var(--ink-soft)}          /* 주석 */
+pre .k{color:var(--warn);font-weight:600} /* 강조 토큰 */
+pre .nan{color:var(--warn);font-weight:600}
+
+.cards{display:grid;gap:28px}
+.card{background:#fff;border:1.5px solid var(--rule);border-radius:16px;padding:26px 32px;box-shadow:0 2px 0 var(--rule)}
+.card .n{font-family:var(--font-display);font-size:64px;font-weight:700;color:var(--cell);line-height:1}
+.card .t{font-size:30px;font-weight:600;margin-top:12px}
+.card .d{font-size:24px;color:var(--ink-soft);margin-top:8px;line-height:1.5;word-break:keep-all}
+.card.warn .n{color:var(--warn)}
+.card.out .n{color:var(--out)}
+
+.stat{display:flex;flex-direction:column;justify-content:center}
+.stat .big{font-family:var(--font-display);font-size:150px;font-weight:700;line-height:1;color:var(--cell);letter-spacing:-.02em}
+.stat .big small{font-size:56px;color:var(--ink-soft);margin-left:14px;font-family:var(--font-body);font-weight:500}
+.stat .cap{font-size:32px;color:var(--ink-soft);margin-top:18px}
+
+table.tb{border-collapse:collapse;width:100%;font-size:28px;background:#fff;border:1.5px solid var(--rule);border-radius:14px;overflow:hidden}
+.tb th,.tb td{padding:16px 24px;border-bottom:1px solid var(--rule);text-align:left;vertical-align:middle}
+.tb th{font-size:22px;color:var(--ink-soft);font-weight:600;background:var(--paper-2);letter-spacing:.04em}
+.tb tr:last-child td{border-bottom:none}
+.tb td.mono,.tb th.mono{font-family:var(--font-mono)}
+.tb td.num{text-align:right;font-family:var(--font-mono)}
+.tb tr.hl td{background:var(--warn-bg)}
+.tb tr.hl2 td{background:var(--cell-bg)}
+
+.two{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;flex:1}
+.two>*{min-width:0}
+.pill{display:inline-block;font-family:var(--font-mono);font-size:22px;padding:6px 18px;border-radius:999px;border:1.5px solid var(--cell);color:var(--cell);margin-right:10px}
+.pill.warn{border-color:var(--warn);color:var(--warn)}
+.pill.out{border-color:var(--out);color:var(--out)}
+
+.steps{display:flex;gap:0;align-items:stretch;margin-top:24px}
+.step{flex:1;background:#fff;border:1.5px solid var(--rule);padding:40px 44px;position:relative;border-radius:16px}
+.step+.step{margin-left:60px}
+.step+.step::before{content:'→';position:absolute;left:-52px;top:50%;transform:translateY(-50%);font-size:52px;color:var(--ink-soft)}
+.step .num{font-family:var(--font-mono);font-size:22px;color:var(--cell);letter-spacing:.14em}
+.step .ti{font-family:var(--font-display);font-size:44px;font-weight:700;margin:10px 0 12px;word-break:keep-all}
+.step .de{font-size:26px;color:var(--ink-soft);line-height:1.5;word-break:keep-all}
+.step.now{border-color:var(--cell);box-shadow:0 0 0 6px var(--cell-bg)}
+
+.note{border-left:8px solid var(--warn);background:var(--warn-bg);padding:18px 30px;border-radius:0 12px 12px 0;font-size:26px;line-height:1.45;word-break:keep-all}
+.note b{color:var(--warn)}
+
+/* 분포 막대 (평균 vs 중앙값) */
+.dist{position:relative;height:120px;background:#fff;border:1.5px solid var(--rule);border-radius:14px;margin-top:20px}
+.dist .bar{position:absolute;left:4%;right:4%;top:50%;height:12px;background:var(--rule);transform:translateY(-50%);border-radius:6px}
+.dist .mk{position:absolute;top:50%;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;border:5px solid #fff;box-shadow:0 0 0 2px var(--rule)}
+.dist .mk.med{background:var(--out)}
+.dist .mk.mean{background:var(--warn)}
+.dist .lb{position:absolute;transform:translateX(-50%);font-family:var(--font-mono);font-size:22px;white-space:nowrap}
+.dist .lb.top{top:8px}
+.dist .lb.bot{bottom:8px}
+.dist .lb.med{color:var(--out)}
+.dist .lb.mean{color:var(--warn)}
+.dist .lb.dim{color:var(--ink-soft)}
+
+/* ===========================================
+   TITLE SLIDE
+   =========================================== */
+.title-slide .slide-content{justify-content:center;padding-left:160px}
+.title-slide .kicker{font-size:28px}
+.title-slide h1{font-family:var(--font-display);font-size:120px;font-weight:700;line-height:1.12;letter-spacing:-.02em;max-width:1500px;word-break:keep-all}
+.title-slide h1 em{font-style:normal;color:var(--cell)}
+.title-slide .sub{font-size:40px;color:var(--ink-soft);margin-top:36px;word-break:keep-all}
+.title-slide .meta{margin-top:70px;display:flex;gap:26px;align-items:center;font-family:var(--font-mono);font-size:24px;color:var(--ink-soft)}
+.title-slide .meta span{padding:8px 20px;border:1.5px solid var(--rule);border-radius:999px;background:#fff}
+.ink-blot{position:absolute;right:-120px;top:-120px;width:760px;height:760px;border-radius:50%;background:radial-gradient(circle at 40% 40%,rgba(5,80,174,.14),rgba(5,80,174,0) 65%);pointer-events:none}
+
+/* ===========================================
+   DECK CHROME — 진행바, 편집 버튼
+   =========================================== */
+.progress{position:fixed;left:0;top:0;height:6px;background:var(--cell);width:0;z-index:1001;transition:width .4s var(--ease)}
+.edit-hotzone{position:fixed;top:0;left:0;width:80px;height:80px;z-index:10000;cursor:pointer}
+.edit-toggle{position:fixed;top:16px;left:16px;z-index:10001;width:48px;height:48px;border-radius:50%;border:none;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.25);font-size:22px;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .3s}
+.edit-toggle.show,.edit-toggle.active{opacity:1;pointer-events:auto}
+.edit-toggle.active{outline:3px solid var(--warn)}
+body.editing [contenteditable="true"]{outline:2px dashed var(--warn);outline-offset:4px;cursor:text}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="edit-hotzone"></div>
+<button class="edit-toggle" id="editToggle" title="편집 모드 (E) · Ctrl+S 저장">✏️</button>
+
+<div class="deck-viewport">
+<main class="deck-stage" id="deckStage">
+
+<!-- ===== 1. 표지 ===== -->
+<section class="slide title-slide active">
+  <div class="ink-blot"></div>
+  <div class="slide-content">
+    <div class="kicker reveal">파이썬을 활용한 기초통계 분석 · 1차시</div>
+    <h1 class="reveal">데이터를 열어 보고,<br><em>한 줄로 요약</em>하기</h1>
+    <p class="sub reveal">HCCP 근로자 조사 10,759명 × 47개 변수를 pandas의 <code style="font-family:var(--font-mono)">describe()</code>로 읽는다</p>
+    <div class="meta reveal"><span>코드 5개</span><span>VS Code · Jupyter</span><span>2026-09-14</span></div>
+  </div>
+</section>
+
+<!-- ===== 2. 오늘의 목표 ===== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="kicker reveal">오늘의 목표</div>
+    <h2 class="reveal">함수는 하나, <em>describe()</em>.<br>그 앞뒤가 오늘 수업입니다</h2>
+    <div class="steps reveal">
+      <div class="step"><div class="num">01</div><div class="ti">데이터가 무엇인지 안다</div><div class="de">누구를 조사했고, 한 행과 한 열이 무엇을 뜻하는지</div></div>
+      <div class="step"><div class="num">02</div><div class="ti">코드 5개로 열어 본다</div><div class="de">read_csv → head → shape → info → describe</div></div>
+      <div class="step now"><div class="num">03</div><div class="ti">결과표를 읽는다</div><div class="de">count · mean · 50%가 각각 무엇을 말하는지 설명할 수 있다</div></div>
+    </div>
+    <p class="lead reveal" style="margin-top:44px">외울 문법은 없습니다. 상자 안의 코드를 그대로 붙여 넣고, <b>결과를 읽는 데</b> 시간을 씁니다.</p>
+  </div>
+  <div class="footer-tag">1차시 · 목표</div><div class="pagenum">2</div>
+</section>
+
+<!-- ===== 3. 데이터 소개 ===== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="kicker reveal">데이터 소개</div>
+    <h2 class="reveal">HCCP 2023 근로자 조사 <span style="font-size:36px;color:var(--ink-soft);font-family:var(--font-body);font-weight:500">hccp_worker_2023_selected.csv</span></h2>
+    <div class="two" style="grid-template-columns:1.1fr 1fr">
+      <div class="reveal">
+        <p class="lead" style="margin-bottom:36px">한국직업능력연구원 <b>인적자본기업패널</b>(Human Capital Corporate Panel)에서 근로자 한 명이 한 행. 교육훈련·직무만족·소득 관련 변수만 골라 담았습니다.</p>
+        <div class="cards" style="grid-template-columns:1fr 1fr">
+          <div class="card"><div class="n">10,759</div><div class="t">행 = 근로자 한 명</div></div>
+          <div class="card"><div class="n">47</div><div class="t">열 = 변수 하나</div></div>
+          <div class="card out"><div class="n">100%</div><div class="t">숫자 열</div><div class="d">한글·문자 열이 없어 바로 계산 가능</div></div>
+          <div class="card warn"><div class="n">6</div><div class="t">결측 있는 변수</div><div class="d">나머지 41개는 빠진 값 없음</div></div>
+        </div>
+      </div>
+      <div class="reveal">
+        <div class="out"><div class="lbl">파일 원본 첫 3줄 (메모장으로 열면)</div>
+<pre class="small">company_id,worker_id,…,gender,birth_year,…
+1,1,101,1,1,1,2,16,1,1,2,2,2,<span class="nan">,</span>2,<span class="nan">,</span>1,…,2,1995,2,5,3
+1,6,106,1,1,3,1,7,1,2,1,2,1,4,1,4,2,…,1,1991,1,5,3</pre></div>
+        <p style="font-size:26px;color:var(--ink-soft);margin-top:20px;line-height:1.5">첫 줄이 변수 이름, 둘째 줄부터 한 사람씩. 쉼표 사이가 비어 있는 곳(<span style="color:var(--warn);font-weight:600">,,</span>)이 결측값입니다.</p>
+      </div>
+    </div>
+  </div>
+  <div class="footer-tag">데이터 이해</div><div class="pagenum">3</div>
+</section>
+
+<!-- ===== 4. 변수 7묶음 ===== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="kicker reveal">데이터 이해</div>
+    <h2 class="reveal">변수 47개는 <em>7묶음</em>으로 보면 끝</h2>
+    <div class="cards reveal" style="grid-template-columns:repeat(4,1fr)">
+      <div class="card" style="opacity:.75"><div class="n" style="color:var(--ink-soft)">3</div><div class="t">식별자</div><div class="d">company_id · worker_id … 계산에서 제외</div></div>
+      <div class="card"><div class="n">5</div><div class="t">기업·직무</div><div class="d">산업군 · 기업규모 · 직급 · 직무분야</div></div>
+      <div class="card"><div class="n">13</div><div class="t">교육훈련</div><div class="d">참여 여부 · OJT/Off-JT 효과 · 충분성 · 직무관련성</div></div>
+      <div class="card"><div class="n">3</div><div class="t">숙련·자격</div><div class="d">입사 시/현재 숙련 수준 · 자격증</div></div>
+      <div class="card"><div class="n">12</div><div class="t">직무 태도·만족</div><div class="d">모두 1~5점 — 자율성 · 신뢰 · 만족 · 이직의도 · 피로</div></div>
+      <div class="card"><div class="n">6</div><div class="t">고용·시간·소득</div><div class="d">정규직 · 노조 · 근로시간 · <b>연소득(만원)</b></div></div>
+      <div class="card"><div class="n">5</div><div class="t">인적 속성</div><div class="d"><b>성별</b> · 출생연도 · 혼인 · <b>학력</b> · 전공</div></div>
+      <div class="card" style="background:var(--cell-bg);border-color:var(--cell)"><div class="n" style="font-size:40px;line-height:1.2">오늘 쓰는 변수</div><div class="d" style="font-family:var(--font-mono);font-size:22px;margin-top:14px">annual_income_10k_krw<br>regular_work_hours<br>overall_job_satisfaction<br>gender</div></div>
+    </div>
+  </div>
+  <div class="footer-tag">데이터 이해</div><div class="pagenum">4</div>
+</section>
+
+<!-- ===== 5. 숫자의 세 종류 ===== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="kicker reveal">데이터 이해</div>
+    <h2 class="reveal">전부 숫자지만, <em>같은 숫자가 아닙니다</em></h2>
+    <table class="tb reveal">
+      <tr><th style="width:220px">종류</th><th>예</th><th style="width:420px">평균을 내면</th><th style="width:420px">알맞은 요약</th></tr>
+      <tr><td><b>연속형</b><br><span style="font-size:22px;color:var(--ink-soft)">등간·비율척도</span></td><td class="mono">annual_income_10k_krw · regular_work_hours · birth_year</td><td>의미 있음<br><span style="color:var(--ink-soft);font-size:24px">평균 연소득 5,137만원</span></td><td><span class="pill">describe()</span></td></tr>
+      <tr><td><b>서열척도</b><br><span style="font-size:22px;color:var(--ink-soft)">순서는 있지만 간격이 일정하지 않음</span></td><td class="mono">overall_job_satisfaction (1~5) · skill_level (1~7)</td><td>참고용<br><span style="color:var(--ink-soft);font-size:24px">평균 3.43점</span></td><td><span class="pill">describe()</span> + 빈도표</td></tr>
+      <tr class="hl"><td><b>명명척도 (코드)</b><br><span style="font-size:22px;color:var(--ink-soft)">순서나 크기가 없음</span></td><td class="mono">gender · education_level · industry_group</td><td><b style="color:var(--warn)">의미 없음</b><br><span style="color:var(--ink-soft);font-size:24px">성별 평균 1.30?</span></td><td><span class="pill warn">value_counts()</span> <span style="font-size:22px;color:var(--ink-soft)">다음 차시</span></td></tr>
+      <tr><td><b>식별자</b></td><td class="mono">company_id · worker_id · company_worker_id</td><td>의미 없음</td><td>계산에서 제외</td></tr>
+    </table>
+    <div class="note reveal" style="margin-top:32px"><b>describe()는 이 구분을 모릅니다.</b> 47개 열 전부에 평균을 냅니다. 뜻 없는 숫자가 섞여 나와도 오류가 아니라, 내가 골라 읽어야 하는 것입니다.</div>
+  </div>
+  <div class="footer-tag">데이터 이해</div><div class="pagenum">5</div>
+</section>
+
+<!-- ===== 6. 코드 1 read_csv ===== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="kicker reveal">코드 1 / 5</div>
+    <h2 class="reveal">불러오기 — <em>read_csv</em></h2>
+    <div class="cell reveal"><div class="lbl">노트북 셀에 입력</div>
+<pre><span class="k">import</span> pandas <span class="k">as</span> pd                                   <span class="c"># pandas를 pd라는 짧은 이름으로</span>
+
+df = pd.read_csv(<span class="k">"hccp_worker_2023_selected.csv"</span>)     <span class="c"># CSV를 읽어 df에 담는다</span></pre></div>
+    <div class="two" style="margin-top:44px;flex:0">
+      <div class="reveal">
+        <div class="out"><div class="lbl">실행 결과</div><pre>(아무것도 나오지 않음)</pre></div>
+        <p style="font-size:28px;color:var(--ink-soft);margin-top:18px;line-height:1.5">결과가 없는 것이 정상입니다. 셀 왼쪽에 초록 체크가 뜨면 성공. 이제부터 <b style="color:var(--ink)">df</b>가 표 전체의 이름입니다.</p>
+      </div>
+      <div class="reveal">
+        <div class="note"><b>막히면 90%는 경로.</b> 노트북 파일과 CSV를 <b>같은 폴더</b>에 두면 파일 이름만 써도 됩니다. 다른 폴더면 <span style="font-family:var(--font-mono)">r"C:\…\파일.csv"</span>처럼 앞에 r을 붙여 전체 경로.</div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-tag">따라 하기</div><div class="pagenum">6</div>
+</section>
+
+<!-- ===== 7. 코드 2 head ===== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="kicker reveal">코드 2 / 5</div>
+    <h2 class="reveal">생김새 — <em>head()</em> · 처음 5행만</h2>
+    <div class="cell reveal"><div class="lbl">노트북 셀에 입력</div><pre>df.head()          <span class="c"># 괄호 안에 10을 넣으면 10행</span></pre></div>
+    <div class="out reveal" style="margin-top:28px"><div class="lbl">실행 결과 — 가운데 열 생략</div>
+<pre class="small">   company_id  worker_id  company_worker_id  industry_group  ...  birth_year  marital_status  education_level  major_field
+<span class="k">0</span>           1          1                101               1  ...      1995.0               2                5          3.0
+<span class="k">1</span>           1          6                106               1  ...      1991.0               1                5          3.0
+<span class="k">2</span>           1         11                111               1  ...      1984.0               2                5          1.0
+<span class="k">3</span>           1         12                112               1  ...      1985.0               2                5          3.0
+<span class="k">4</span>           1        401               1401               1  ...      1975.0               2                3          <span class="nan">NaN</span>
+
+[5 rows x 47 columns]</pre></div>
+    <div class="cards reveal" style="grid-template-columns:1fr 1fr 1fr;margin-top:22px">
+      <div class="card"><div class="t">맨 왼쪽 0~4</div><div class="d">행 번호. 파이썬은 0부터 셉니다</div></div>
+      <div class="card"><div class="t">한 줄 = 한 사람</div><div class="d">가로로 47개 값이 이어집니다 (노트북에선 스크롤 표)</div></div>
+      <div class="card warn"><div class="t" style="color:var(--warn)">NaN</div><div class="d">비어 있는 칸. 통계 계산에서 자동 제외</div></div>
+    </div>
+  </div>
+  <div class="footer-tag">따라 하기</div><div class="pagenum">7</div>
+</section>
+
+<!-- ===== 8. 코드 3 shape ===== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="kicker reveal">코드 3 / 5</div>
+    <h2 class="reveal">크기 — <em>shape</em></h2>
+    <div class="two" style="align-items:center">
+      <div class="reveal">
+        <div class="cell"><div class="lbl">노트북 셀에 입력</div><pre>df.shape           <span class="c"># 괄호 없음!</span></pre></div>
+        <div class="out" style="margin-top:28px"><div class="lbl">실행 결과</div><pre style="font-size:64px;font-weight:600">(10759, 47)</pre></div>
+      </div>
+      <div class="reveal">
+        <div class="stat"><div class="big">10,759<small>행</small></div><div class="cap">응답자 수</div></div>
+        <div class="stat" style="margin-top:40px"><div class="big" style="color:var(--out)">47<small>열</small></div><div class="cap">변수 수</div></div>
+      </div>
+    </div>
+    <div class="note reveal"><b>shape 뒤에는 괄호가 없습니다.</b> head()·describe()는 "동작"이라 괄호가 붙고, shape는 표가 가진 "속성"이라 괄호 없이 읽습니다.</div>
+  </div>
+  <div class="footer-tag">따라 하기</div><div class="pagenum">8</div>
+</section>
+
+<!-- ===== 9. 코드 4 info ===== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="kicker reveal">코드 4 / 5</div>
+    <h2 class="reveal">구조 — <em>info()</em> · 빠진 값과 자료형</h2>
+    <div class="two" style="grid-template-columns:1.15fr 1fr">
+      <div class="reveal">
+        <div class="cell"><div class="lbl">노트북 셀에 입력</div><pre>df.info()</pre></div>
+        <div class="out" style="margin-top:24px"><div class="lbl">실행 결과 — 일부</div>
+<pre class="small">RangeIndex: 10759 entries, 0 to 10758
+Data columns (total 47 columns):
+ #   Column                     Non-Null Count  Dtype
+---  ------                     --------------  -----
+ 0   company_id                 10759 non-null  int64
+ 13  ojt_effect                 <span class="k"> 6856 non-null</span>  float64
+ 40  annual_income_10k_krw      <span class="k"> 8537 non-null</span>  float64
+ 41  monthly_income_10k_krw     <span class="k"> 2122 non-null</span>  float64
+ 42  gender                     10759 non-null  int64
+ 43  birth_year                 10731 non-null  float64
+dtypes: float64(8), int64(39)</pre></div>
+      </div>
+      <div class="reveal">
+        <div class="cards" style="grid-template-columns:1fr">
+          <div class="card"><div class="t">Non-Null Count &lt; 10759 이면 결측</div><div class="d">연소득은 8,537명만 응답. 나머지 2,222명은 월소득으로 답했습니다</div></div>
+          <div class="card"><div class="t">int64 = 정수, float64 = 소수</div><div class="d">1~5점 변수도 결측이 섞이면 float64가 되어 4.0처럼 보입니다</div></div>
+          <div class="card out"><div class="t" style="color:var(--out)">object(문자) 열이 0개</div><div class="d">47개 전부 숫자 → 바로 통계량을 낼 수 있습니다</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-tag">따라 하기</div><div class="pagenum">9</div>
+</section>
+
+<!-- ===== 10. 코드 5 describe ===== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="kicker reveal">코드 5 / 5 · 오늘의 목표</div>
+    <h2 class="reveal">기초통계량 — <em>describe()</em></h2>
+    <div class="cell reveal"><div class="lbl">노트북 셀에 입력</div><pre>df.describe()      <span class="c"># 숫자형 변수 전체의 기초통계량</span></pre></div>
+    <div class="out reveal" style="margin-top:28px"><div class="lbl">실행 결과 — 가운데 열 생략</div>
+<pre class="small">         company_id     worker_id  company_worker_id  ...  marital_status  education_level  major_field
+count  10759.000000  10759.000000       1.075900e+04  ...    10759.000000     10759.000000  8053.000000
+mean    2334.727391    350.355888       2.143197e+06  ...        1.545683         4.268984     2.610952
+std     2103.769291    146.454976       2.170592e+06  ...        0.532706         1.100945     1.459169
+min        1.000000      1.000000       1.010000e+02  ...        1.000000         1.000000     1.000000
+25%      656.000000    401.000000       3.563545e+05  ...        1.000000         3.000000     1.000000
+50%     1930.000000    412.000000       1.308421e+06  ...        2.000000         5.000000     3.000000
+75%     3258.000000    429.000000       3.148402e+06  ...        1.000000         5.000000     3.000000
+max    10792.000000    482.000000       1.079240e+07  ...        3.000000         7.000000     8.000000
+
+[8 rows x 47 columns]</pre></div>
+    <div class="two" style="margin-top:20px;flex:0;gap:32px">
+      <div class="note reveal" style="border-left-color:var(--out);background:var(--out-bg)"><b style="color:var(--out)">8행 × 47열이 나오면 오늘 목표 달성.</b> 행은 통계량 8개, 열은 변수 47개입니다.</div>
+      <div class="note reveal"><b>1.075900e+04?</b> 값이 커서 지수 표기(1.0759 × 10⁴ = 10,759)한 것. 식별자 열에서만 나오니 무시.</div>
+    </div>
+  </div>
+  <div class="footer-tag">따라 하기</div><div class="pagenum">10</div>
+</section>
+
+<!-- ===== 11. describe 좁히기 ===== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="kicker reveal">describe 다루기</div>
+    <h2 class="reveal">47개는 안 읽힙니다. <em>보고 싶은 변수만</em> 고르세요</h2>
+    <div class="two" style="grid-template-columns:.95fr 1.05fr">
+      <div class="reveal">
+        <div class="cell"><div class="lbl">여러 변수 — 대괄호 두 겹 [[ ]]</div>
+<pre class="small" style="font-size:19px">df[[<span class="k">"annual_income_10k_krw"</span>,
+    <span class="k">"regular_work_hours"</span>,
+    <span class="k">"overall_job_satisfaction"</span>]].describe().round(2)</pre></div>
+        <div class="cell" style="margin-top:24px"><div class="lbl">변수 하나 — 대괄호 한 겹 [ ]</div>
+<pre class="small" style="font-size:19px">df[<span class="k">"annual_income_10k_krw"</span>].describe().round(2)</pre></div>
+        <p style="font-size:26px;color:var(--ink-soft);margin-top:22px;line-height:1.5"><span style="font-family:var(--font-mono)">.round(2)</span>는 소수점 둘째 자리까지. 변수 이름은 <span style="font-family:var(--font-mono)">df.columns</span>에서 <b style="color:var(--ink)">복사해서</b> 붙이세요. 밑줄 하나 틀리면 KeyError.</p>
+      </div>
+      <div class="reveal">
+        <div class="out"><div class="lbl">실행 결과</div>
+<pre class="small" style="font-size:18px">       annual_income_10k_krw  regular_work_hours  overall_job_satisfaction
+count                8537.00            10759.00                  10759.00
+mean                 5137.46               40.44                      3.43
+std                  1998.99                2.25                      0.72
+min                  2000.00               28.00                      1.00
+25%                  3800.00               40.00                      3.00
+50%                  4700.00               40.00                      3.00
+75%                  6000.00               40.00                      4.00
+max                 21800.00               60.00                      5.00</pre></div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-tag">따라 하기</div><div class="pagenum">11</div>
+</section>
+
+<!-- ===== 12. 8행 읽는 법 ===== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="kicker reveal">결과 읽기</div>
+    <h2 class="reveal">8행의 뜻 — 연소득(만원)으로 읽어 보기</h2>
+    <table class="tb reveal" style="font-size:27px">
+      <tr><th style="width:130px">행</th><th style="width:260px">뜻</th><th style="width:200px">연소득</th><th>이렇게 읽습니다</th></tr>
+      <tr><td class="mono">count</td><td>결측 뺀 응답 수</td><td class="num">8,537</td><td>10,759명 중 8,537명만 연소득 응답. 2,222명은 월소득으로 답해 비어 있음</td></tr>
+      <tr><td class="mono">mean</td><td>평균</td><td class="num">5,137.46</td><td>평균 연소득 약 5,137만원</td></tr>
+      <tr><td class="mono">std</td><td>표준편차</td><td class="num">1,998.99</td><td>평균에서 대략 ±2,000만원 안에 대다수가 있음 (흩어진 정도)</td></tr>
+      <tr><td class="mono">min</td><td>최솟값</td><td class="num">2,000</td><td>가장 낮은 응답</td></tr>
+      <tr><td class="mono">25%</td><td>1사분위수</td><td class="num">3,800</td><td>낮은 쪽부터 4명 중 1명은 3,800만원 이하</td></tr>
+      <tr class="hl2"><td class="mono"><b>50%</b></td><td><b>중앙값</b></td><td class="num"><b>4,700</b></td><td>한가운데 사람. 절반은 이보다 적고 절반은 많음</td></tr>
+      <tr><td class="mono">75%</td><td>3사분위수</td><td class="num">6,000</td><td>4명 중 3명은 6,000만원 이하</td></tr>
+      <tr><td class="mono">max</td><td>최댓값</td><td class="num">21,800</td><td>가장 높은 응답 2억 1,800만원</td></tr>
+    </table>
+  </div>
+  <div class="footer-tag">결과 읽기</div><div class="pagenum">12</div>
+</section>
+
+<!-- ===== 13. 해석 한 줄 ===== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="kicker reveal">결과 읽기</div>
+    <h2 class="reveal">평균과 중앙값이 다르면 <em>분포가 치우쳤다</em></h2>
+    <div class="two" style="align-items:start">
+      <div class="reveal">
+        <div class="pill warn">annual_income_10k_krw · 연소득</div>
+        <div class="dist">
+          <div class="bar"></div>
+          <div class="lb dim top" style="left:2%;transform:none">min 2,000</div>
+          <div class="lb dim top" style="left:auto;right:2%;transform:none">max 21,800</div>
+          <div class="mk med" style="left:17.6%"></div><div class="lb med bot" style="left:17.6%">중앙값 4,700</div>
+          <div class="mk mean" style="left:19.8%"></div><div class="lb mean top" style="left:19.8%">평균 5,137</div>
+        </div>
+        <p class="lead" style="margin-top:26px;font-size:30px"><b style="color:var(--warn)">평균 &gt; 중앙값</b> → 소수의 고소득자가 평균을 끌어올린 <b>오른쪽 긴 꼬리</b> 분포. 소득처럼 치우친 변수는 "보통 사람"을 <b>중앙값</b>이 더 잘 대표합니다.</p>
+      </div>
+      <div class="reveal">
+        <div class="pill out">regular_work_hours · 주당 근로시간</div>
+        <div class="dist">
+          <div class="bar"></div>
+          <div class="lb dim top" style="left:2%;transform:none">min 28</div>
+          <div class="lb dim top" style="left:auto;right:2%;transform:none">max 60</div>
+          <div class="mk med" style="left:38.5%"></div><div class="lb med bot" style="left:38.5%">25% = 50% = 75% = 40</div>
+          <div class="mk mean" style="left:39.7%"></div><div class="lb mean top" style="left:39.7%">평균 40.44</div>
+        </div>
+        <p class="lead" style="margin-top:26px;font-size:30px"><b style="color:var(--out)">평균 ≈ 중앙값</b>, 25%·50%·75%가 모두 40 → 대부분이 <b>주 40시간</b>. 표준편차 2.25로 거의 흩어지지 않았습니다.</p>
+      </div>
+    </div>
+    <div class="note reveal" style="border-left-color:var(--cell);background:var(--cell-bg)"><b style="color:var(--cell)">한 줄 해석 공식:</b> ① count로 몇 명인지 → ② 50%(중앙값)로 보통 사람 → ③ mean과 비교해 치우침 → ④ min·max로 극단값 확인</div>
+  </div>
+  <div class="footer-tag">결과 읽기</div><div class="pagenum">13</div>
+</section>
+
+<!-- ===== 14. 함정 ===== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="kicker reveal">함정 하나</div>
+    <h2 class="reveal">"성별 평균 <em style="color:var(--warn)">1.30</em>"은 무슨 뜻일까요?</h2>
+    <div class="two" style="align-items:start">
+      <div class="reveal">
+        <div class="cell"><div class="lbl">노트북 셀에 입력</div><pre>df[<span class="k">"gender"</span>].describe()</pre></div>
+        <div class="out" style="margin-top:24px"><div class="lbl">실행 결과</div>
+<pre class="small">count    10759.000000
+<span class="k">mean         1.299749</span>
+std          0.458169
+min          1.000000
+25%          1.000000
+50%          1.000000
+75%          2.000000
+max          2.000000</pre></div>
+      </div>
+      <div class="reveal">
+        <div class="card warn" style="margin-bottom:24px"><div class="t" style="color:var(--warn);font-size:34px">아무 뜻도 없습니다</div><div class="d" style="font-size:27px">1과 2는 크기가 아니라 <b>이름표</b>입니다. describe()는 그걸 모르고 평균을 냈을 뿐.</div></div>
+        <div class="card out"><div class="t" style="color:var(--out);font-size:34px">명명척도 변수는 "몇 명씩인지" 셉니다</div><div class="d" style="font-size:27px;font-family:var(--font-mono)">df["gender"].value_counts()<br><span style="color:var(--ink-soft)">1    7534<br>2    3225</span></div><div class="d" style="font-size:24px;margin-top:12px">→ 다음 차시 첫 코드입니다</div></div>
+      </div>
+    </div>
+    <div class="note reveal">오늘은 이것만: <b>describe 표에서 명명척도 변수 행은 건너뛰고 읽는다.</b></div>
+  </div>
+  <div class="footer-tag">결과 읽기</div><div class="pagenum">14</div>
+</section>
+
+<!-- ===== 15. 정리 & 다음 차시 ===== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="kicker reveal">정리</div>
+    <h2 class="reveal">오늘 코드 5개, 다음엔 <em>질문</em>을 던집니다</h2>
+    <div class="two" style="grid-template-columns:1fr 1fr">
+      <div class="reveal">
+        <table class="tb" style="font-size:27px">
+          <tr><th style="width:90px">#</th><th class="mono" style="width:300px">코드</th><th>무엇을 확인했나</th></tr>
+          <tr><td>1</td><td class="mono">pd.read_csv()</td><td>CSV를 df로 불러오기</td></tr>
+          <tr><td>2</td><td class="mono">df.head()</td><td>행 = 사람, 열 = 변수, NaN</td></tr>
+          <tr><td>3</td><td class="mono">df.shape</td><td>(10759, 47)</td></tr>
+          <tr><td>4</td><td class="mono">df.info()</td><td>결측 개수 · 자료형</td></tr>
+          <tr class="hl2"><td><b>5</b></td><td class="mono"><b>df.describe()</b></td><td><b>8개 통계량 → 읽는 법</b></td></tr>
+        </table>
+        <p style="font-size:26px;color:var(--ink-soft);margin-top:20px;line-height:1.5">노트북은 <b style="color:var(--ink)">Ctrl+S</b>로 저장. 실습 매뉴얼 3-6 체크리스트 7개를 체크하고 마칩니다.</p>
+      </div>
+      <div class="reveal">
+        <div class="cards" style="grid-template-columns:1fr">
+          <div class="card"><div class="t"><span class="pill" style="font-size:20px">다음 차시</span> 명명척도 변수 세기</div><div class="d" style="font-family:var(--font-mono)">value_counts() · normalize=True</div></div>
+          <div class="card"><div class="t"><span class="pill" style="font-size:20px">다음 차시</span> 결측 확인</div><div class="d" style="font-family:var(--font-mono)">isna().sum()</div></div>
+          <div class="card"><div class="t"><span class="pill" style="font-size:20px">다음 차시</span> 집단 비교</div><div class="d">성별에 따라 소득이 다른가? 학력에 따라 만족도가 다른가?<br><span style="font-family:var(--font-mono)">groupby("gender")["annual_income_10k_krw"].agg([...])</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-tag">정리 · 다음 차시</div><div class="pagenum">15</div>
+</section>
+
+</main>
+</div>
+
+<script>
+/* ===========================================
+   SLIDE CONTROLLER — 스테이지 스케일 · 키보드 · 터치 · 휠
+   =========================================== */
+class SlidePresentation{
+  constructor(){
+    this.slides=document.querySelectorAll('.slide');
+    this.stage=document.getElementById('deckStage');
+    this.progress=document.getElementById('progress');
+    this.current=0;
+    this.setupScale();this.setupKeys();this.setupTouch();this.setupWheel();
+    const h=parseInt(location.hash.slice(1),10);
+    this.show(isNaN(h)?0:h-1);
+  }
+  setupScale(){
+    const scale=()=>{
+      const f=Math.min(window.innerWidth/1920,window.innerHeight/1080);
+      const x=(window.innerWidth-1920*f)/2,y=(window.innerHeight-1080*f)/2;
+      this.stage.style.transform=`translate(${x}px,${y}px) scale(${f})`;
+    };
+    scale();window.addEventListener('resize',scale);
+  }
+  setupKeys(){
+    document.addEventListener('keydown',e=>{
+      if(e.target.getAttribute('contenteditable'))return;
+      if(['ArrowRight','ArrowDown','PageDown',' '].includes(e.key)){e.preventDefault();this.next();}
+      else if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();this.prev();}
+      else if(e.key==='Home'){this.show(0);}
+      else if(e.key==='End'){this.show(this.slides.length-1);}
+    });
+  }
+  setupTouch(){
+    let sx=0;
+    document.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;},{passive:true});
+    document.addEventListener('touchend',e=>{
+      const dx=e.changedTouches[0].clientX-sx;
+      if(Math.abs(dx)>50){dx<0?this.next():this.prev();}
+    });
+  }
+  setupWheel(){
+    let lock=false;
+    document.addEventListener('wheel',e=>{
+      if(document.body.classList.contains('editing'))return;
+      if(lock)return;lock=true;setTimeout(()=>lock=false,600);
+      e.deltaY>0?this.next():this.prev();
+    },{passive:true});
+  }
+  show(i){
+    this.current=Math.max(0,Math.min(i,this.slides.length-1));
+    this.slides.forEach((s,k)=>{s.classList.toggle('active',k===this.current);s.classList.toggle('visible',k===this.current);});
+    this.progress.style.width=((this.current+1)/this.slides.length*100)+'%';
+    history.replaceState(null,'','#'+(this.current+1));
+  }
+  next(){this.show(this.current+1);} prev(){this.show(this.current-1);}
+}
+const deck=new SlidePresentation();
+
+/* ===========================================
+   INLINE EDITOR — E 키 또는 왼쪽 위 모서리 hover → 글자 클릭해 수정 · Ctrl+S 저장
+   =========================================== */
+const editor={
+  isActive:false,
+  KEY:'stats-1st-slides-edits',
+  targets(){return document.querySelectorAll('.slide h1,.slide h2,.slide p,.slide .t,.slide .d,.slide .de,.slide .ti,.slide td,.slide th,.slide pre,.slide .note,.slide .cap,.slide .sub,.slide .kicker');},
+  toggleEditMode(){
+    this.isActive=!this.isActive;
+    document.body.classList.toggle('editing',this.isActive);
+    document.getElementById('editToggle').classList.toggle('active',this.isActive);
+    this.targets().forEach(el=>el.setAttribute('contenteditable',this.isActive?'true':'false'));
+    if(!this.isActive)this.save();
+  },
+  save(){
+    try{const data={};this.targets().forEach((el,i)=>data[i]=el.innerHTML);localStorage.setItem(this.KEY,JSON.stringify(data));}catch(e){}
+  },
+  restore(){
+    try{const d=JSON.parse(localStorage.getItem(this.KEY)||'null');if(!d)return;this.targets().forEach((el,i)=>{if(d[i]!=null)el.innerHTML=d[i];});}catch(e){}
+  },
+  download(){
+    this.save();
+    const html='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([html],{type:'text/html'}));
+    a.download='기초통계_1차시_슬라이드.html';a.click();
+  }
+};
+editor.restore();
+const hotzone=document.querySelector('.edit-hotzone'),editToggle=document.getElementById('editToggle');
+let hideTimeout=null;
+const hideLater=()=>{hideTimeout=setTimeout(()=>{if(!editor.isActive)editToggle.classList.remove('show');},400);};
+hotzone.addEventListener('mouseenter',()=>{clearTimeout(hideTimeout);editToggle.classList.add('show');});
+hotzone.addEventListener('mouseleave',hideLater);
+editToggle.addEventListener('mouseenter',()=>clearTimeout(hideTimeout));
+editToggle.addEventListener('mouseleave',hideLater);
+editToggle.addEventListener('click',()=>editor.toggleEditMode());
+hotzone.addEventListener('click',()=>editor.toggleEditMode());
+document.addEventListener('keydown',e=>{
+  if((e.key==='e'||e.key==='E')&&!e.target.getAttribute('contenteditable')&&!e.ctrlKey)editor.toggleEditMode();
+  if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();editor.download();}
+});
+</script>
+</body>
+</html>
